@@ -17,6 +17,7 @@ public partial class PresetLibraryViewModel : ViewModelBase
 {
     private readonly AppServices _services;
     private readonly PresenceEditorViewModel _editor;
+    private readonly Action _goToEditor;
 
     public const string AllCategoriesLabel = "All";
 
@@ -35,10 +36,11 @@ public partial class PresetLibraryViewModel : ViewModelBase
     [ObservableProperty] private KnownApp? _selectedKnownApp;
     [ObservableProperty] private bool _hasSelectedKnownApp;
 
-    public PresetLibraryViewModel(AppServices services, PresenceEditorViewModel editor)
+    public PresetLibraryViewModel(AppServices services, PresenceEditorViewModel editor, Action goToEditor)
     {
         _services = services;
         _editor = editor;
+        _goToEditor = goToEditor;
 
         Categories.Add(AllCategoriesLabel);
         foreach (var cat in services.KnownApps.Categories)
@@ -85,6 +87,7 @@ public partial class PresetLibraryViewModel : ViewModelBase
         if (app is null) return;
         var preset = BuildFromKnownApp(app);
         _editor.LoadPreset(preset);
+        _goToEditor();
     }
 
     [RelayCommand]
@@ -92,13 +95,13 @@ public partial class PresetLibraryViewModel : ViewModelBase
     {
         if (scenario is null || SelectedKnownApp is not { } app) return;
         _editor.LoadPreset(BuildPresetFromScenario(app, scenario));
+        _goToEditor();
     }
 
     [RelayCommand]
     private void StartScenarioInBackground(AppScenario? scenario)
     {
         if (scenario is null || SelectedKnownApp is not { } app) return;
-        if (string.IsNullOrWhiteSpace(app.ClientId)) return;
         _services.Connections.Start(
             BuildPresetFromScenario(app, scenario),
             $"{app.DisplayName} — {scenario.Name}");
@@ -107,7 +110,7 @@ public partial class PresetLibraryViewModel : ViewModelBase
     [RelayCommand]
     private void StartKnownAppInBackground(KnownApp? app)
     {
-        if (app is null || string.IsNullOrWhiteSpace(app.ClientId)) return;
+        if (app is null) return;
         _services.Connections.Start(BuildFromKnownApp(app), app.DisplayName);
     }
 
@@ -130,13 +133,13 @@ public partial class PresetLibraryViewModel : ViewModelBase
     {
         if (entry is null) return;
         _editor.LoadPreset(entry.Preset);
+        _goToEditor();
     }
 
     [RelayCommand]
     private void StartUserPresetInBackground(PresetEntry? entry)
     {
         if (entry?.Preset is not { } preset) return;
-        if (string.IsNullOrWhiteSpace(preset.ClientId)) return;
         _services.Connections.Start(preset, preset.Metadata.Name);
     }
 

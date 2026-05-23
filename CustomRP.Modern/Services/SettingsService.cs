@@ -13,6 +13,9 @@ public sealed class AppSettings
     public bool AutoReconnect { get; set; } = true;
     public bool MinimizeToTray { get; set; } = true;
 
+    /// <summary>Optional Katsau API key for high-quality favicon resolution via HTML parsing.</summary>
+    public string KatsauApiKey { get; set; } = "";
+
     /// <summary>
     /// One Discord Application Client ID per known-app category.
     /// Replace each placeholder with a dedicated Discord Application you create at

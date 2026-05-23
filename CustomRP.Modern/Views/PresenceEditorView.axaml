@@ -103,7 +103,7 @@
                                 <TextBlock Text="Large Image Key or URL" Classes="label" />
                                 <TextBox Text="{Binding LargeImageKey}" Watermark="Portal asset name or https://image…" />
                                 <TextBlock Classes="muted" FontSize="10" TextWrapping="Wrap"
-                                           Text="Use the asset name from Discord Developer Portal → Rich Presence → Art Assets, or a direct image URL." />
+                                           Text="Asset name from Discord Developer Portal → Rich Presence → Art Assets, or a direct https:// image URL. Discord proxies external URLs — if the image shows in the preview here but shows as '?' in Discord, the URL is blocked by Discord's proxy. Use raw.githubusercontent.com or Imgur for reliable hosting." />
                                 <TextBlock Text="Large Image Tooltip" Classes="label" Margin="0,6,0,0" />
                                 <TextBox Text="{Binding LargeImageText}" Watermark="Shown on hover" MaxLength="128" />
                             </StackPanel>
@@ -307,6 +307,14 @@
                                 <TextBox Text="{Binding PresetDescription}" Watermark="What is this preset for?" />
                             </StackPanel>
                         </Grid>
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Category" Classes="label" />
+                            <ComboBox ItemsSource="{Binding CategoryOptions}"
+                                      SelectedItem="{Binding PresetCategory}"
+                                      HorizontalAlignment="Stretch" />
+                            <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                       Text="Determines which Discord Application ID this preset connects with. Configure per-category IDs in Settings → Discord Applications." />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 

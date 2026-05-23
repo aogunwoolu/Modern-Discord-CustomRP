@@ -12,7 +12,7 @@ namespace CustomRP.Modern.Services;
 public static class AppIconService
 {
     private const string DashBase =
-        "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/";
+        "https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/";
 
     private static readonly IReadOnlyDictionary<string, string> Slugs =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)

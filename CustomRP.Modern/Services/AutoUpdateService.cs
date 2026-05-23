@@ -1,6 +1,7 @@
 using CustomRP.Modern.Models;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -98,13 +99,22 @@ public sealed class AutoUpdateService : IDisposable
             string? url = null;
             string? favicon = null;
 
-            if (config.Strategy == AutoUpdateStrategy.BrowserUrl &&
-                BrowserUrlReader.IsBrowser(process.ProcessName))
+            // Read the URL when the user wants it in templates *or* when they
+            // want a favicon overlay — the favicon needs the URL regardless of
+            // which template strategy is selected.
+            var processIsBrowser = BrowserUrlReader.IsBrowser(process.ProcessName);
+            var needUrl = processIsBrowser &&
+                (config.Strategy == AutoUpdateStrategy.BrowserUrl || config.UseFaviconAsSmallImage);
+            if (needUrl)
             {
                 url = _urlReader.TryReadUrl(process);
                 if (config.UseFaviconAsSmallImage && !string.IsNullOrWhiteSpace(url))
                     favicon = _favicons.GetDiscordCompatibleUrl(url);
             }
+
+            DiagAuto($"capture process={process.ProcessName} isBrowser={processIsBrowser} strategy={config.Strategy} useFavicon={config.UseFaviconAsSmallImage} needUrl={needUrl} edits={_urlReader.LastEditCount} url={url ?? "<null>"} favicon={favicon ?? "<null>"}");
+            if (needUrl && url is null && !string.IsNullOrEmpty(_urlReader.LastEditDiag))
+                DiagAuto($"  editDiag: {_urlReader.LastEditDiag}");
 
             return new LiveSnapshot
             {
@@ -147,6 +157,21 @@ public sealed class AutoUpdateService : IDisposable
     {
         Stop();
         _urlReader.Dispose();
+    }
+
+    private static readonly string DiagAutoPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "CustomRP.Modern", "auto-update.log");
+    private static readonly object DiagAutoGate = new();
+    private static void DiagAuto(string msg)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(DiagAutoPath)!);
+            lock (DiagAutoGate)
+                File.AppendAllText(DiagAutoPath, $"[{DateTime.Now:HH:mm:ss.fff}] {msg}{Environment.NewLine}");
+        }
+        catch { }
     }
 }
 

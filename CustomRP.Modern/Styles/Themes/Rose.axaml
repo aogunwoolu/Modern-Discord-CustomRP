@@ -1,0 +1,22 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Rose — deep warm dark with rose/crimson accents -->
+    <Color x:Key="AppBackgroundColor">#100A0D</Color>
+    <Color x:Key="AppSurfaceColor">#1A1014</Color>
+    <Color x:Key="AppSurfaceElevatedColor">#221520</Color>
+    <Color x:Key="AppSurfaceHoverColor">#2D1C28</Color>
+    <Color x:Key="AppBorderColor">#3D2535</Color>
+    <Color x:Key="AppTextPrimaryColor">#FFE8F0</Color>
+    <Color x:Key="AppTextSecondaryColor">#C48EA0</Color>
+    <Color x:Key="AppTextMutedColor">#7A5060</Color>
+    <Color x:Key="AppAccentColor">#E91E8C</Color>
+    <Color x:Key="AppAccentHoverColor">#F06292</Color>
+    <Color x:Key="AppAccentPressedColor">#C2185B</Color>
+    <Color x:Key="AppSuccessColor">#66BB6A</Color>
+    <Color x:Key="AppWarningColor">#FFA726</Color>
+    <Color x:Key="AppDangerColor">#EF5350</Color>
+    <Color x:Key="AppDiscordCardColor">#1E1018</Color>
+    <Color x:Key="AppDiscordCardHeaderColor">#12080D</Color>
+
+</ResourceDictionary>

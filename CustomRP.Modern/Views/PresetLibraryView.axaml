@@ -203,7 +203,7 @@
 
                                     <!-- Primary actions -->
                                     <StackPanel Spacing="6">
-                                        <Button Content="Use this app in editor"
+                                        <Button Content="Edit in Editor"
                                                 Classes="accent"
                                                 HorizontalAlignment="Stretch"
                                                 HorizontalContentAlignment="Center"
@@ -244,7 +244,7 @@
                                                             <StackPanel Grid.Row="2" Grid.ColumnSpan="2"
                                                                         Orientation="Horizontal" Spacing="6"
                                                                         Margin="0,8,0,0">
-                                                                <Button Content="Use"
+                                                                <Button Content="Edit"
                                                                         Classes="accent"
                                                                         Padding="10,4"
                                                                         Command="{Binding $parent[UserControl].((vm:PresetLibraryViewModel)DataContext).OpenScenarioInEditorCommand}"
@@ -331,7 +331,7 @@
                                                 <TextBlock Text="{Binding Preset.Metadata.Description}" Classes="muted" FontSize="11" TextWrapping="Wrap" MaxLines="3" />
                                             </StackPanel>
                                             <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
-                                                <Button Content="Open" Classes="accent" Padding="10,4"
+                                                <Button Content="Edit" Classes="accent" Padding="10,4"
                                                         Command="{Binding $parent[ItemsControl].((vm:PresetLibraryViewModel)DataContext).LoadCommand}"
                                                         CommandParameter="{Binding}" />
                                                 <Button Content="Save copy" Classes="ghost" Padding="10,4"

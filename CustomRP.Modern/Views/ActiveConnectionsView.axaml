@@ -80,6 +80,10 @@
                                     <StackPanel Grid.Column="3" Grid.RowSpan="3"
                                                 Orientation="Horizontal" Spacing="6"
                                                 VerticalAlignment="Center">
+                                        <Button Content="Edit"
+                                                Classes="accent"
+                                                Command="{Binding $parent[ItemsControl].((vm:ActiveConnectionsViewModel)DataContext).LoadIntoEditorCommand}"
+                                                CommandParameter="{Binding}" />
                                         <Button Content="Reconnect"
                                                 Classes="ghost"
                                                 Command="{Binding $parent[ItemsControl].((vm:ActiveConnectionsViewModel)DataContext).ReconnectCommand}"

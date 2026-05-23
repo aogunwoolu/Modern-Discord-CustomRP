@@ -37,11 +37,13 @@ public static class ImageKeyProcessor
 
     /// <summary>
     /// Discord builds an mp:external/… string from http(s) keys; must stay under 256 chars.
+    /// The format is mp:external/&lt;43-char hash&gt;/&lt;scheme&gt;/&lt;host&gt;&lt;path&gt; — the
+    /// query string is NOT part of the counted portion, only the path component is.
     /// </summary>
     private static bool IsMpExternalStringOverLimit(Uri uri)
     {
         var host = uri.IdnHost == "media.discordapp.net" ? "cdn.discordapp.com" : uri.IdnHost;
-        var external = $"mp:external/43 characters that probably represent an id/{Uri.EscapeDataString(uri.Query)}/{uri.Scheme}/{host}{uri.AbsolutePath}";
+        var external = $"mp:external/43 characters that probably represent an id/{uri.Scheme}/{host}{uri.AbsolutePath}";
         return external.Length > 256;
     }
 }

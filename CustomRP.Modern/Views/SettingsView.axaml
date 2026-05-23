@@ -24,8 +24,22 @@
                         <StackPanel Spacing="4">
                             <TextBlock Text="Theme" Classes="label" />
                             <ComboBox ItemsSource="{Binding Themes}"
-                                      SelectedItem="{Binding Theme}"
-                                      HorizontalAlignment="Stretch" />
+                                      SelectedItem="{Binding SelectedTheme}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ThemeOption">
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <Border Width="14" Height="14" CornerRadius="7"
+                                                    Background="{Binding Accent}"
+                                                    VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Name}"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <TextBlock Classes="muted" FontSize="10"
+                                       Text="Custom themes apply immediately after clicking Save." />
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -51,6 +65,41 @@
                     </StackPanel>
                 </Border>
 
+                <!-- ── Favicon ─────────────────────────────────────────── -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="Favicon" Classes="h3" />
+                            <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                       Text="Controls which service is used to fetch site favicons for the &quot;Use website favicon as small image&quot; feature." />
+                        </StackPanel>
+
+                        <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                CornerRadius="6" Padding="10,10">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Tier order (first that returns an image wins)" FontWeight="SemiBold" FontSize="12" />
+                                <TextBlock FontSize="11" TextWrapping="Wrap"
+                                           Text="0. Katsau API (if key is set) — HTML-parsed, highest accuracy" />
+                                <TextBlock FontSize="11" TextWrapping="Wrap"
+                                           Text="1. Google S2 — up to 128 px PNG, no key required" />
+                                <TextBlock FontSize="11" TextWrapping="Wrap"
+                                           Text="2. DuckDuckGo — 16 px ICO fallback" />
+                                <TextBlock FontSize="11" TextWrapping="Wrap"
+                                           Text="3. Direct /favicon.ico on the site" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Katsau API Key (optional)" Classes="label" />
+                            <TextBox Text="{Binding KatsauApiKey}"
+                                     Watermark="sk-…  (leave blank to use Google S2 / DuckDuckGo)"
+                                     PasswordChar="●" />
+                            <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                       Text="Get a free key at katsau.com. When set, Katsau parses the page HTML to find the best available favicon — useful for sites with non-standard favicon setups." />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
                 <Border Classes="card">
                     <StackPanel Spacing="8">
                         <TextBlock Text="Preset Storage" Classes="h3" />
@@ -64,7 +113,7 @@
                 <Border Classes="card">
                     <StackPanel Spacing="8">
                         <TextBlock Text="Diagnostics" Classes="h3" />
-                        <TextBlock Text="Discord RPC log" Classes="label" />
+                        <TextBlock Text="Discord RPC worker logs" Classes="label" />
                         <TextBlock Text="{Binding DiscordLogPath}"
                                    Classes="muted"
                                    FontSize="11"

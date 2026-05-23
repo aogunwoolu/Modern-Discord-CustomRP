@@ -1,0 +1,65 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version from csproj
+        id: version
+        shell: pwsh
+        run: |
+          $version = (Select-Xml -Path CustomRP.Modern/CustomRP.Modern.csproj `
+            -XPath "//Version").Node.InnerText
+          "VERSION=$version" >> $env:GITHUB_OUTPUT
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore CustomRP.Modern/CustomRP.Modern.csproj
+
+      - name: Publish win-x64 (self-contained single-file)
+        shell: pwsh
+        run: |
+          dotnet publish CustomRP.Modern/CustomRP.Modern.csproj `
+            -r win-x64 -c Release `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -o publish/win-x64
+
+      - name: Create ZIP
+        shell: pwsh
+        run: |
+          $tag = "v${{ steps.version.outputs.VERSION }}-${{ github.run_number }}"
+          Compress-Archive -Path publish/win-x64/* `
+            -DestinationPath "CustomRP-Modern-$tag-win-x64.zip"
+          "ZIP_NAME=CustomRP-Modern-$tag-win-x64.zip" >> $env:GITHUB_OUTPUT
+          "TAG=$tag"                                   >> $env:GITHUB_OUTPUT
+        id: zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.zip.outputs.TAG }}
+          name: "CustomRP Modern ${{ steps.zip.outputs.TAG }}"
+          body: |
+            Automated build from commit ${{ github.sha }}.
+
+            **Changes in this build:**
+            ${{ github.event.head_commit.message }}
+          prerelease: false
+          files: ${{ steps.zip.outputs.ZIP_NAME }}

@@ -1,7 +1,10 @@
 using CustomRP.Modern.Models;
-using DiscordRPC;
 using DiscordRPC.Logging;
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,16 +36,16 @@ public sealed class RpcStateChangedEventArgs : EventArgs
 }
 
 /// <summary>
-/// A single live Discord RPC connection bound to one Client ID. Owns its own
-/// <see cref="DiscordRpcClient"/> and surfaces state via events. The
-/// <see cref="ConnectionManager"/> aggregates multiple of these — letting the
-/// user run several presences at once.
+/// Parent-side handle for one Discord RPC connection. The actual Discord
+/// client lives inside a child worker process so each active presence has its
+/// own PID — without that, Discord deduplicates every activity coming from
+/// the same process into a single visible slot regardless of Client ID.
 /// </summary>
 public sealed class RpcConnection : IDisposable
 {
-    private readonly ILogger _logger;
-    private DiscordRpcClient? _client;
-    private Timer? _keepAlive;
+    private readonly object _gate = new();
+    private Process? _proc;
+    private CancellationTokenSource? _readerCts;
     private RpcConnectionState _state = RpcConnectionState.Disconnected;
 
     public string ClientId { get; }
@@ -63,148 +66,195 @@ public sealed class RpcConnection : IDisposable
     public event EventHandler<string>? PresenceSent;
     public event EventHandler<string>? PresenceFailed;
 
-    public RpcConnection(string clientId, string displayName, Preset preset, ILogger logger)
+    // Ctor kept compatible with the in-process version — the logger arg is
+    // ignored here because each worker writes its own log file.
+    public RpcConnection(string clientId, string displayName, Preset preset, ILogger? _ = null)
     {
         ClientId = clientId;
         DisplayName = displayName;
         Preset = preset;
-        _logger = logger;
     }
 
     public void Connect()
     {
-        Disconnect();
-        UiDispatcher.Invoke(() => SetState(RpcConnectionState.Connecting, "Connecting to Discord…"));
-
-        _client = new DiscordRpcClient(ClientId, Pipe)
+        lock (_gate)
         {
-            Logger = _logger,
-            SkipIdenticalPresence = false,
-        };
+            StopWorker();
 
-        _client.OnReady += (_, msg) =>
-        {
-            UiDispatcher.Post(async () =>
+            var exe = Environment.ProcessPath
+                ?? Path.Combine(AppContext.BaseDirectory, "CustomRP.Modern.exe");
+
+            // BOM-less UTF-8 — Encoding.UTF8 emits a BOM that fails JSON parsing
+            // on the worker side.
+            var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+            var psi = new ProcessStartInfo
             {
-                Username = msg.User.Username;
-                AvatarUrl = msg.User.GetAvatarURL(User.AvatarFormat.PNG);
-                SetState(RpcConnectionState.Connected,
-                    $"Connected as {Username}", Username, AvatarUrl);
-                // Brief delay matches legacy WinForms Invoke ordering after Ready.
-                await Task.Delay(150);
-                if (_client is { IsDisposed: false })
-                    TrySendPresence(_client, Preset);
-                StartKeepAlive();
-            });
-        };
+                FileName = exe,
+                Arguments = Program.WorkerArg,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                StandardInputEncoding = utf8,
+                StandardOutputEncoding = utf8,
+            };
 
-        _client.OnPresenceUpdate += (_, _) =>
-        {
-            UiDispatcher.Post(() =>
+            SetState(RpcConnectionState.Connecting, "Spawning worker…");
+
+            Process proc;
+            try { proc = Process.Start(psi) ?? throw new InvalidOperationException("Process.Start returned null"); }
+            catch (Exception ex)
             {
-                LastError = null;
-                PresenceSent?.Invoke(this, LastSentSummary ?? "Presence active");
-            });
-        };
+                SetState(RpcConnectionState.Error, $"Could not spawn worker: {ex.Message}");
+                return;
+            }
 
-        _client.OnConnectionFailed += (_, _) =>
-            UiDispatcher.Post(() => SetState(RpcConnectionState.Error,
-                "Discord pipe unavailable (is Discord running?)"));
+            _proc = proc;
 
-        _client.OnError += (_, msg) =>
-        {
-            UiDispatcher.Post(() =>
+            // Ship the init command — pipe, displayName, full preset including
+            // resolved ClientId — and let the worker handle Discord from here.
+            Preset.ClientId = ClientId;
+            var init = new WorkerCommand
             {
-                LastError = $"{msg.Code}: {msg.Message}";
-                PresenceFailed?.Invoke(this, LastError);
-                SetState(RpcConnectionState.Error, LastError);
-            });
-        };
-
-        _client.OnClose += (_, _) =>
-        {
-            UiDispatcher.Post(() =>
+                Cmd = "init",
+                Pipe = Pipe,
+                DisplayName = DisplayName,
+                Preset = Preset,
+            };
+            try
             {
-                StopKeepAlive();
-                if (_state == RpcConnectionState.Connected)
-                    SetState(RpcConnectionState.Disconnected, "Connection closed.");
-            });
-        };
+                proc.StandardInput.WriteLine(JsonSerializer.Serialize(init, WorkerJson.Options));
+                proc.StandardInput.Flush();
+            }
+            catch (Exception ex)
+            {
+                SetState(RpcConnectionState.Error, $"Worker handshake failed: {ex.Message}");
+                StopWorker();
+                return;
+            }
 
-        if (!_client.Initialize())
-            UiDispatcher.Post(() => SetState(RpcConnectionState.Error,
-                "Could not open Discord IPC pipe (is Discord running?)"));
+            _readerCts = new CancellationTokenSource();
+            var token = _readerCts.Token;
+            _ = Task.Run(() => PumpEvents(proc, token), token);
+
+            // Drain stderr so the child doesn't block on a full pipe buffer.
+            _ = Task.Run(async () =>
+            {
+                try { await proc.StandardError.ReadToEndAsync().ConfigureAwait(false); }
+                catch { }
+            });
+        }
     }
 
     public void Disconnect()
     {
-        StopKeepAlive();
-        if (_client is { IsDisposed: false })
+        lock (_gate)
         {
-            try { _client.ClearPresence(); } catch { /* ignore */ }
-            try { _client.Dispose(); } catch { /* ignore */ }
+            StopWorker();
+            if (_state != RpcConnectionState.Disconnected)
+                SetState(RpcConnectionState.Disconnected, "Disconnected.");
         }
-        _client = null;
-        if (_state != RpcConnectionState.Disconnected)
-            SetState(RpcConnectionState.Disconnected, "Disconnected.");
     }
 
     public void UpdatePresence(Preset preset)
     {
-        Preset = preset;
-
-        if (_client is not { IsDisposed: false } client)
+        lock (_gate)
         {
-            const string msg = "Not connected to Discord.";
-            LastError = msg;
-            PresenceFailed?.Invoke(this, msg);
-            return;
+            Preset = preset;
+            if (_proc is null || _proc.HasExited)
+            {
+                const string msg = "Not connected to Discord.";
+                LastError = msg;
+                PresenceFailed?.Invoke(this, msg);
+                return;
+            }
+
+            try
+            {
+                preset.ClientId = ClientId;
+                var cmd = new WorkerCommand { Cmd = "update", Preset = preset };
+                _proc.StandardInput.WriteLine(JsonSerializer.Serialize(cmd, WorkerJson.Options));
+                _proc.StandardInput.Flush();
+            }
+            catch (Exception ex)
+            {
+                LastError = ex.Message;
+                PresenceFailed?.Invoke(this, ex.Message);
+            }
         }
-
-        if (_state != RpcConnectionState.Connected)
-        {
-            const string msg = "Waiting for Discord handshake…";
-            LastError = msg;
-            PresenceFailed?.Invoke(this, msg);
-            return;
-        }
-
-        UiDispatcher.Invoke(() => TrySendPresence(client, preset));
     }
 
-    private void StartKeepAlive()
-    {
-        StopKeepAlive();
-        _keepAlive = new Timer(_ =>
-        {
-            if (_client is { IsDisposed: false } c && _state == RpcConnectionState.Connected)
-                UiDispatcher.Post(() => TrySendPresence(c, Preset));
-        }, null, TimeSpan.FromSeconds(90), TimeSpan.FromSeconds(90));
-    }
+    public void Dispose() => Disconnect();
 
-    private void StopKeepAlive()
-    {
-        _keepAlive?.Dispose();
-        _keepAlive = null;
-    }
-
-    private void TrySendPresence(DiscordRpcClient client, Preset preset)
+    private void PumpEvents(Process proc, CancellationToken token)
     {
         try
         {
-            var presence = PresencePayloadBuilder.Build(preset);
-            client.SetPresence(presence);
-            var summary = PresencePayloadBuilder.Summarize(presence);
-            LastSentAt = DateTime.Now;
-            LastSentSummary = summary;
-            LastError = null;
-            PresenceSent?.Invoke(this, summary);
+            while (!token.IsCancellationRequested)
+            {
+                string? line;
+                try { line = proc.StandardOutput.ReadLine(); }
+                catch { break; }
+                if (line is null) break;
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
+                WorkerEvent? evt;
+                try { evt = JsonSerializer.Deserialize<WorkerEvent>(line, WorkerJson.Options); }
+                catch { continue; }
+                if (evt is null) continue;
+
+                HandleEvent(evt);
+            }
         }
         catch (Exception ex)
         {
-            LastError = ex.Message;
-            PresenceFailed?.Invoke(this, ex.Message);
-            SetState(RpcConnectionState.Error, ex.Message);
+            // Worker pipe died unexpectedly — surface as error so UI updates.
+            SetState(RpcConnectionState.Error, $"Worker pipe lost: {ex.Message}");
+        }
+        finally
+        {
+            // If the worker exited on its own, reflect Disconnected unless we
+            // already moved to Error.
+            lock (_gate)
+            {
+                if (_state == RpcConnectionState.Connected || _state == RpcConnectionState.Connecting)
+                    SetState(RpcConnectionState.Disconnected, "Worker exited.");
+            }
+        }
+    }
+
+    private void HandleEvent(WorkerEvent evt)
+    {
+        switch (evt.Event)
+        {
+            case "state":
+                var state = evt.State switch
+                {
+                    "Connecting" => RpcConnectionState.Connecting,
+                    "Connected" => RpcConnectionState.Connected,
+                    "Disconnected" => RpcConnectionState.Disconnected,
+                    "Error" => RpcConnectionState.Error,
+                    _ => _state,
+                };
+                if (evt.Username is not null) Username = evt.Username;
+                if (evt.AvatarUrl is not null) AvatarUrl = evt.AvatarUrl;
+                if (state == RpcConnectionState.Error && evt.Message is not null)
+                    LastError = evt.Message;
+                SetState(state, evt.Message, Username, AvatarUrl);
+                break;
+
+            case "sent":
+                LastSentAt = DateTime.Now;
+                LastSentSummary = evt.Summary ?? "Presence active";
+                LastError = null;
+                PresenceSent?.Invoke(this, LastSentSummary);
+                break;
+
+            case "failed":
+                LastError = evt.Message ?? "Unknown error";
+                PresenceFailed?.Invoke(this, LastError);
+                break;
         }
     }
 
@@ -218,5 +268,42 @@ public sealed class RpcConnection : IDisposable
         StateChanged?.Invoke(this, new RpcStateChangedEventArgs(state, message, username, avatarUrl));
     }
 
-    public void Dispose() => Disconnect();
+    private void StopWorker()
+    {
+        var proc = _proc;
+        var cts = _readerCts;
+        _proc = null;
+        _readerCts = null;
+
+        cts?.Cancel();
+        cts?.Dispose();
+
+        if (proc is null) return;
+
+        try
+        {
+            if (!proc.HasExited)
+            {
+                try
+                {
+                    proc.StandardInput.WriteLine(JsonSerializer.Serialize(
+                        new WorkerCommand { Cmd = "stop" }, WorkerJson.Options));
+                    proc.StandardInput.Flush();
+                }
+                catch { /* worker may already be gone */ }
+
+                try { proc.StandardInput.Close(); } catch { }
+
+                if (!proc.WaitForExit(1500))
+                {
+                    try { proc.Kill(entireProcessTree: true); } catch { }
+                }
+            }
+        }
+        catch { /* swallow — disposing */ }
+        finally
+        {
+            try { proc.Dispose(); } catch { }
+        }
+    }
 }

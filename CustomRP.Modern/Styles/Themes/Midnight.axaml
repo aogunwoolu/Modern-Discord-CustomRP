@@ -1,0 +1,22 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Midnight — true near-black with electric indigo/violet accents -->
+    <Color x:Key="AppBackgroundColor">#07070B</Color>
+    <Color x:Key="AppSurfaceColor">#0E0E18</Color>
+    <Color x:Key="AppSurfaceElevatedColor">#141422</Color>
+    <Color x:Key="AppSurfaceHoverColor">#1B1B2E</Color>
+    <Color x:Key="AppBorderColor">#25254D</Color>
+    <Color x:Key="AppTextPrimaryColor">#EDEDFF</Color>
+    <Color x:Key="AppTextSecondaryColor">#8B8BCC</Color>
+    <Color x:Key="AppTextMutedColor">#52526E</Color>
+    <Color x:Key="AppAccentColor">#7C4DFF</Color>
+    <Color x:Key="AppAccentHoverColor">#9E72FF</Color>
+    <Color x:Key="AppAccentPressedColor">#5E35B1</Color>
+    <Color x:Key="AppSuccessColor">#00E676</Color>
+    <Color x:Key="AppWarningColor">#FFD740</Color>
+    <Color x:Key="AppDangerColor">#FF5252</Color>
+    <Color x:Key="AppDiscordCardColor">#111120</Color>
+    <Color x:Key="AppDiscordCardHeaderColor">#0A0A15</Color>
+
+</ResourceDictionary>

@@ -59,6 +59,14 @@ public partial class PresenceEditorViewModel : ViewModelBase
     [ObservableProperty] private string _presetName = "Untitled preset";
     [ObservableProperty] private string _presetAuthor = "";
     [ObservableProperty] private string _presetDescription = "";
+    [ObservableProperty] private string _presetCategory = "";
+
+    /// <summary>Category options available in the editor's category picker —
+    /// "(none)" plus every key the user has configured in Settings.</summary>
+    public IReadOnlyList<string> CategoryOptions =>
+        new[] { "(none)" }
+            .Concat(_services.Settings.Current.CategoryClientIds.Keys.OrderBy(k => k))
+            .ToList();
 
     [ObservableProperty] private string _connectButtonLabel = "Connect";
     [ObservableProperty] private bool _isConnected;
@@ -110,6 +118,15 @@ public partial class PresenceEditorViewModel : ViewModelBase
         services.Connections.Changed += (_, _) =>
         {
             Avalonia.Threading.Dispatcher.UIThread.Post(SyncConnectionState);
+        };
+
+        // Adopt any connection that already exists for this ClientId when the
+        // app restores active presets on startup (before the editor had a chance
+        // to set _connectedPreset via ToggleConnection).
+        services.Connections.ConnectionAdded += (_, conn) =>
+        {
+            if (_connectedPreset is null && conn.ClientId == EffectiveClientId)
+                _connectedPreset = conn.Preset;
         };
 
         services.AutoUpdate.Updated += (_, snapshot) =>
@@ -271,6 +288,7 @@ public partial class PresenceEditorViewModel : ViewModelBase
         PresetName = preset.Metadata.Name;
         PresetAuthor = preset.Metadata.Author;
         PresetDescription = preset.Metadata.Description;
+        PresetCategory = string.IsNullOrWhiteSpace(preset.Metadata.Category) ? "(none)" : preset.Metadata.Category;
 
         var au = preset.AutoUpdate;
         AutoUpdateEnabled = au.Enabled;
@@ -339,7 +357,7 @@ public partial class PresenceEditorViewModel : ViewModelBase
             Description = PresetDescription,
             Tags = Preset?.Metadata?.Tags is { Count: > 0 } t ? new List<string>(t) : new(),
             IconUrl = Preset?.Metadata?.IconUrl ?? "",
-            Category = Preset?.Metadata?.Category ?? "",
+            Category = PresetCategory == "(none)" ? "" : PresetCategory,
             Created = Preset?.Metadata?.Created ?? DateTime.UtcNow,
             Modified = DateTime.UtcNow,
         },
@@ -373,6 +391,14 @@ public partial class PresenceEditorViewModel : ViewModelBase
         return preset;
     }
 
+    /// <summary>Resolves the live category from the editor's UI — normalizes
+    /// the "(none)" sentinel back to empty.</summary>
+    private string CurrentCategory =>
+        string.IsNullOrEmpty(PresetCategory) || PresetCategory == "(none)" ? "" : PresetCategory;
+
+    partial void OnPresetCategoryChanged(string value) => SyncConnectionState();
+    partial void OnClientIdChanged(string value) => SyncConnectionState();
+
     /// <summary>
     /// The Client ID that will actually be used when connecting. Category setting
     /// takes priority over the per-preset ClientId field.
@@ -381,7 +407,7 @@ public partial class PresenceEditorViewModel : ViewModelBase
     {
         get
         {
-            var category = Preset?.Metadata?.Category ?? "";
+            var category = CurrentCategory;
             if (!string.IsNullOrEmpty(category)
                 && _services.Settings.Current.CategoryClientIds.TryGetValue(category, out var catId)
                 && !string.IsNullOrWhiteSpace(catId))
@@ -468,7 +494,14 @@ public partial class PresenceEditorViewModel : ViewModelBase
     {
         var conn = EditorConnection;
         if (conn is null) return;
-        try { conn.UpdatePresence(BuildEffectivePreset()); }
+        var effective = BuildEffectivePreset();
+        try
+        {
+            conn.UpdatePresence(effective);
+            // UpdatePresence replaces conn.Preset with a new instance; keep
+            // _connectedPreset in sync so ReferenceEquals still returns true.
+            _connectedPreset = effective;
+        }
         catch { /* swallow */ }
     }
 

@@ -9,6 +9,7 @@
         x:Class="CustomRP.Modern.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="CustomRP — Discord Rich Presence Manager"
+        Icon="avares://CustomRP.Modern/Assets/app.ico"
         Width="1180" Height="760"
         MinWidth="960" MinHeight="640"
         WindowStartupLocation="CenterScreen"

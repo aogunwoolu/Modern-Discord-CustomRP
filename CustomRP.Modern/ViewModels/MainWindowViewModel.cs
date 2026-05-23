@@ -38,10 +38,10 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _services = services;
         Editor = new PresenceEditorViewModel(services);
-        Library = new PresetLibraryViewModel(services, Editor);
+        Library = new PresetLibraryViewModel(services, Editor, () => SelectedSection = "Editor");
         Detect = new AppDetectViewModel(services, Editor, () => SelectedSection = "Editor");
         Settings = new SettingsViewModel(services);
-        Active = new ActiveConnectionsViewModel(services);
+        Active = new ActiveConnectionsViewModel(services, Editor, () => SelectedSection = "Editor");
 
         services.Connections.Changed += (_, _) => Dispatcher.UIThread.Post(RefreshAggregateStatus);
     }

@@ -14,7 +14,6 @@ namespace CustomRP.Modern.Services;
 /// </summary>
 public sealed class ConnectionManager : IDisposable
 {
-    private readonly DiscordFileLogger _logger = new();
     private readonly SettingsService _settings;
 
     public ObservableCollection<RpcConnection> Connections { get; } = new();
@@ -38,10 +37,8 @@ public sealed class ConnectionManager : IDisposable
     /// </summary>
     public RpcConnection Start(Preset preset, string? displayName = null)
     {
-        if (string.IsNullOrWhiteSpace(preset.ClientId))
-            preset.ClientId = PresencePayloadBuilder.DefaultClientId;
-
-        var clientId = preset.ClientId.Trim();
+        preset.ClientId = ResolveClientId(preset);
+        var clientId = preset.ClientId;
         var existing = Find(clientId);
         if (existing is not null)
         {
@@ -56,8 +53,7 @@ public sealed class ConnectionManager : IDisposable
         var conn = new RpcConnection(
             clientId,
             displayName ?? preset.Metadata.Name,
-            preset,
-            _logger)
+            preset)
         {
             Pipe = _settings.Current.DiscordPipe,
         };
@@ -91,4 +87,24 @@ public sealed class ConnectionManager : IDisposable
     }
 
     public void Dispose() => StopAll();
+
+    /// <summary>
+    /// Resolves the Client ID a preset should connect with. Preset's explicit
+    /// ClientId wins; otherwise the per-category ID from Settings is used so
+    /// that two presets in different categories never collide on the default
+    /// app and overwrite each other in Discord.
+    /// </summary>
+    private string ResolveClientId(Preset preset)
+    {
+        if (!string.IsNullOrWhiteSpace(preset.ClientId))
+            return preset.ClientId.Trim();
+
+        var category = preset.Metadata?.Category ?? "";
+        if (!string.IsNullOrEmpty(category)
+            && _settings.Current.CategoryClientIds.TryGetValue(category, out var catId)
+            && !string.IsNullOrWhiteSpace(catId))
+            return catId.Trim();
+
+        return PresencePayloadBuilder.DefaultClientId;
+    }
 }
