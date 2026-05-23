@@ -383,6 +383,14 @@ public partial class PresenceEditorViewModel : ViewModelBase
                 Text = preset.SmallImage.Text,
             };
         }
+        else if (AutoUpdateUseFavicon)
+        {
+            // Favicon mode is on but the verified URL isn't ready yet (or no
+            // favicon exists for this host).  Send an empty key so Discord shows
+            // no small image rather than falling back to the static SmallImageKey,
+            // which may be a portal asset name Discord would render as "?".
+            preset.SmallImage = new ImageAsset { Key = "", Text = preset.SmallImage.Text };
+        }
         preset.Buttons = new List<PresenceButton>
         {
             new() { Text = EffectiveButton1Text, Url = EffectiveButton1Url },

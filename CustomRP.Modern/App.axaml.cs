@@ -105,7 +105,7 @@ public partial class App : Application
 
         if (theme is "Dark" or "Light" or "System") return;
 
-        merged.Add(new ResourceInclude(default(IServiceProvider))
+        merged.Add(new ResourceInclude((Uri?)null)
         {
             Source = new Uri($"avares://CustomRP.Modern/Styles/Themes/{theme}.axaml"),
         });

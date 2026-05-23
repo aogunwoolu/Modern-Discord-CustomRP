@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
@@ -15,10 +14,16 @@ namespace CustomRP.Modern.Services;
 /// </summary>
 public sealed class FaviconService
 {
-    private static readonly HttpClient Http = new()
+    private static readonly HttpClient Http = MakeHttpClient();
+
+    private static HttpClient MakeHttpClient()
     {
-        Timeout = TimeSpan.FromSeconds(5),
-    };
+        var client = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
+        client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+        return client;
+    }
 
     private readonly SettingsService _settings;
     private readonly string _cacheDir;
@@ -36,79 +41,46 @@ public sealed class FaviconService
     }
 
     /// <summary>
-    /// Returns the best available Discord-compatible favicon URL for the given site.
-    /// Tier priority:
-    ///   0. Katsau API (if key configured) — returns the site's actual favicon URL
-    ///   1. Google S2 (128 px PNG — highest quality; Discord proxy fetches the full URL
-    ///      including query string, so ?domain=…&sz= is preserved at fetch time)
-    ///   2. DuckDuckGo IP3 (.ico fallback)
-    ///   3. Direct /favicon.ico on the origin host
-    /// The first call returns Google S2 immediately; background verification upgrades
-    /// to Katsau (if available) and caches the best result for subsequent calls.
+    /// Returns a Discord-compatible favicon URL for the given page URL.
+    /// Uses wsrv.nl as the public image proxy: it fetches the DuckDuckGo
+    /// favicon (which covers most sites), converts ICO→PNG on the fly, and
+    /// serves it from a CDN that Discord’s media proxy can access.
+    /// If a Katsau API key is configured the result is upgraded in the
+    /// background to the highest-quality icon and cached for future calls.
     /// </summary>
     public string? GetDiscordCompatibleUrl(string url)
     {
         if (!TryGetHost(url, out var host)) return null;
 
-        // Return the verified winner from a previous resolution cycle.
-        if (_hostToDiscordUrl.TryGetValue(host, out var cached)) return cached;
+        // Katsau upgrade: if an API key is set and we have a cached result, use it.
+        if (_hostToDiscordUrl.TryGetValue(host, out var cached) && cached.Length > 0)
+            return cached;
 
-        // Kick off background verification for future calls (fire-and-forget).
-        _ = Task.Run(() => ResolveDiscordUrlAsync(host, url));
+        // Kick off the Katsau background upgrade if a key is configured and
+        // this host hasn’t been attempted yet.
+        var apiKey = _settings.Current.KatsauApiKey?.Trim();
+        if (!string.IsNullOrEmpty(apiKey) && !_hostToDiscordUrl.ContainsKey(host))
+            _ = Task.Run(() => ResolveKatsauAsync(host, url, apiKey));
 
-        // Optimistic immediate return — Google S2 returns PNG which Discord handles well.
-        return GoogleFaviconUrl(host);
+        // Immediate return via wsrv.nl: fetches DuckDuckGo’s favicon for the
+        // host, converts ICO→PNG, and serves it from a CDN Discord can reach.
+        return WsrvFaviconUrl(host);
     }
 
-    private static string GoogleFaviconUrl(string host) =>
-        $"https://www.google.com/s2/favicons?domain={Uri.EscapeDataString(host)}&sz=128";
-
-    private static string DuckDuckGoFaviconUrl(string host) =>
-        $"https://icons.duckduckgo.com/ip3/{host}.ico";
-
-    private async Task ResolveDiscordUrlAsync(string host, string originalUrl)
+    private static string WsrvFaviconUrl(string host)
     {
-        // Tier 0 (optional): Katsau API — parses the actual page HTML for the
-        // highest-quality favicon. Requires a user-supplied API key.
-        var apiKey = _settings.Current.KatsauApiKey?.Trim();
-        if (!string.IsNullOrEmpty(apiKey))
-        {
-            var katsauUrl = await TryKatsauAsync(originalUrl, apiKey).ConfigureAwait(false);
-            if (katsauUrl is not null)
-            {
-                _hostToDiscordUrl[host] = katsauUrl;
-                return;
-            }
-        }
+        var ddg = Uri.EscapeDataString($"icons.duckduckgo.com/ip3/{host}.ico");
+        return $"https://wsrv.nl/?url={ddg}&output=png&w=64&h=64";
+    }
 
-        // Tiers 1–3: verify in descending quality order.
-        var tiers = new List<string>
-        {
-            GoogleFaviconUrl(host),
-            DuckDuckGoFaviconUrl(host),
-            $"https://{host}/favicon.ico",
-        };
+    private async Task ResolveKatsauAsync(string host, string originalUrl, string apiKey)
+    {
+        // Mark as attempted immediately to prevent duplicate background tasks.
+        _hostToDiscordUrl[host] = "";
 
-        foreach (var candidate in tiers)
-        {
-            try
-            {
-                using var req = new HttpRequestMessage(HttpMethod.Get, candidate);
-                using var resp = await Http.SendAsync(
-                    req, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-                var ct = resp.Content.Headers.ContentType?.MediaType ?? "";
-                if (resp.IsSuccessStatusCode &&
-                    ct.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-                {
-                    _hostToDiscordUrl[host] = candidate;
-                    return;
-                }
-            }
-            catch { }
-        }
-
-        // All tiers failed — fall back to DuckDuckGo silently.
-        _hostToDiscordUrl[host] = $"https://icons.duckduckgo.com/ip3/{host}.ico";
+        var katsauUrl = await TryKatsauAsync(originalUrl, apiKey).ConfigureAwait(false);
+        if (katsauUrl is not null)
+            _hostToDiscordUrl[host] = katsauUrl;
     }
 
     /// <summary>

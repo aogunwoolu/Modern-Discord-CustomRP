@@ -151,6 +151,7 @@ public sealed class AutoUpdateService : IDisposable
         a is null
         || a.WindowTitle != b.WindowTitle
         || a.Url != b.Url
+        || a.FaviconUrl != b.FaviconUrl
         || a.ProcessFound != b.ProcessFound;
 
     public void Dispose()
