@@ -81,11 +81,9 @@
                                 <TextBlock FontSize="11" TextWrapping="Wrap"
                                            Text="0. Katsau API (if key is set) — HTML-parsed, highest accuracy" />
                                 <TextBlock FontSize="11" TextWrapping="Wrap"
-                                           Text="1. Google S2 — up to 128 px PNG, no key required" />
+                                           Text="1. DuckDuckGo via wsrv.nl — ICO converted to PNG, accessible by Discord" />
                                 <TextBlock FontSize="11" TextWrapping="Wrap"
-                                           Text="2. DuckDuckGo — 16 px ICO fallback" />
-                                <TextBlock FontSize="11" TextWrapping="Wrap"
-                                           Text="3. Direct /favicon.ico on the site" />
+                                           Text="Katsau (if key is set) upgrades to the highest-quality icon in the background." />
                             </StackPanel>
                         </Border>
 
@@ -132,30 +130,25 @@
                     </StackPanel>
                 </Border>
 
-                <!-- ── Discord Applications ─────────────────────────────── -->
+                <!-- ── Discord Application ─────────────────────────────── -->
                 <Border Classes="card">
                     <StackPanel Spacing="12">
                         <StackPanel Spacing="2">
-                            <TextBlock Text="Discord Applications" Classes="h3" />
+                            <TextBlock Text="Discord Application" Classes="h3" />
                             <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
-                                       Text="Each category uses a separate Discord Application so multiple presences can run simultaneously. Apps in the same category replace each other." />
+                                       Text="Discord shows one activity per Application ID. To run multiple presences simultaneously, set a unique ID per preset in the editor." />
                         </StackPanel>
 
-                        <!-- Setup guide -->
                         <Border Background="{DynamicResource AppSurfaceHoverBrush}"
                                 CornerRadius="6" Padding="10,10">
                             <StackPanel Spacing="6">
                                 <TextBlock Text="How to get an Application ID" FontWeight="SemiBold" FontSize="12" />
                                 <TextBlock FontSize="11" TextWrapping="Wrap"
-                                           Text="1. Click the button below to open the Discord Developer Portal." />
+                                           Text="1. Go to the Discord Developer Portal and click New Application." />
                                 <TextBlock FontSize="11" TextWrapping="Wrap"
-                                           Text="2. Click New Application and give it a name (e.g. &quot;CustomRP – Games&quot;)." />
+                                           Text="2. Copy the APPLICATION ID from the General Information page." />
                                 <TextBlock FontSize="11" TextWrapping="Wrap"
-                                           Text="3. On the General Information page, copy the APPLICATION ID (the long number under the app name)." />
-                                <TextBlock FontSize="11" TextWrapping="Wrap"
-                                           Text="4. Paste it in the matching category field below, then click Save changes." />
-                                <TextBlock FontSize="11" TextWrapping="Wrap" Classes="muted"
-                                           Text="You can create up to 25 applications for free. Default IDs are provided — you only need to create your own if you want independent category slots." />
+                                           Text="3. Paste it here (default for all presets) or in the editor per-preset." />
                                 <Button Content="Open Discord Developer Portal →"
                                         Classes="ghost"
                                         HorizontalAlignment="Left"
@@ -163,29 +156,15 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- One row per category -->
-                        <ItemsControl ItemsSource="{Binding CategoryClientIds}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:CategoryClientIdEntry">
-                                    <Grid ColumnDefinitions="28,130,*" Margin="0,3">
-                                        <TextBlock Grid.Column="0"
-                                                   Text="{Binding CategoryIcon}"
-                                                   FontSize="16"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding Category}"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="13"
-                                                   Margin="0,0,8,0" />
-                                        <TextBox Grid.Column="2"
-                                                 Text="{Binding ClientId}"
-                                                 Watermark="Application ID (18–19 digits)"
-                                                 FontFamily="Consolas, Cascadia Mono, monospace"
-                                                 FontSize="12" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Default Application ID" Classes="label" />
+                            <TextBox Text="{Binding DefaultClientId}"
+                                     Watermark="18–19 digit Application ID"
+                                     FontFamily="Consolas, Cascadia Mono, monospace"
+                                     FontSize="12" />
+                            <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                       Text="Used by any preset that does not override its own Client ID in the editor." />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 

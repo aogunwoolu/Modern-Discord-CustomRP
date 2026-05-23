@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CustomRP — Custom Discord Rich Presence</title>
+  <meta name="description" content="Set custom Discord Rich Presence statuses, auto-detect running apps, live-update from browser URLs, and run multiple presences at once." />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Landing-page only styles ─────────────────── */
+    .hero {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center;
+      padding: 7rem 2rem 4rem;
+      background: radial-gradient(ellipse 80% 55% at 50% -10%, #5865f230 0%, transparent 68%);
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: #5865f218; border: 1px solid #5865f23a;
+      color: #a0aaff; font-size: .75rem; font-weight: 700;
+      padding: .25rem .8rem; border-radius: 999px;
+      margin-bottom: 1.5rem; letter-spacing: .06em; text-transform: uppercase;
+    }
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800; line-height: 1.1; letter-spacing: -.02em;
+    }
+    h1 em { color: var(--accent); font-style: normal; }
+    .hero-sub {
+      margin-top: 1.25rem; max-width: 580px;
+      color: var(--muted); font-size: 1.1rem;
+    }
+    .hero-actions {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      justify-content: center; margin-top: 2.5rem;
+    }
+    .hero-note { margin-top: 1rem; color: var(--muted); font-size: .82rem; }
+
+    /* presence card mock */
+    .preview-wrap { display: flex; justify-content: center; padding: .5rem 2rem 4rem; }
+    .presence-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.25rem 1.5rem;
+      display: flex; align-items: flex-start; gap: 1rem;
+      max-width: 360px; width: 100%;
+      box-shadow: 0 12px 40px #00000055;
+    }
+    .p-img { position: relative; flex-shrink: 0; }
+    .p-large {
+      width: 64px; height: 64px; border-radius: 12px;
+      background: #2a2d3a;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .p-large svg { width: 36px; height: 36px; color: var(--accent); }
+    .p-small {
+      position: absolute; bottom: -5px; right: -5px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--accent); border: 2px solid var(--card);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .p-small svg { width: 12px; height: 12px; color: #fff; }
+    .p-text { flex: 1; min-width: 0; }
+    .p-type { font-size: .7rem; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: .06em; }
+    .p-name { font-size: .95rem; font-weight: 700; margin-top: .1rem; }
+    .p-detail { font-size: .82rem; color: var(--muted); margin-top: .15rem; }
+    .p-time { font-size: .75rem; color: var(--green); margin-top: .4rem; display: flex; align-items: center; gap: .3rem; }
+    .p-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; }
+
+    /* sections */
+    section.landing { padding: 5rem 2rem; }
+    section.landing.alt {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-inner { max-width: 1080px; margin: 0 auto; }
+    .section-eyebrow { color: var(--accent); font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+    .section-title { font-size: clamp(1.6rem, 3.5vw, 2.2rem); font-weight: 800; margin-top: .35rem; letter-spacing: -.01em; }
+    .section-sub { color: var(--muted); margin-top: .7rem; max-width: 520px; font-size: 1rem; }
+
+    /* feature grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.25rem; margin-top: 3rem;
+    }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.4rem 1.5rem;
+      transition: border-color .2s;
+    }
+    .feature-card:hover { border-color: #5865f255; }
+    .feat-icon {
+      width: 38px; height: 38px; border-radius: 9px;
+      background: #5865f220; display: flex; align-items: center; justify-content: center;
+      margin-bottom: .9rem;
+    }
+    .feat-icon svg { width: 20px; height: 20px; color: var(--accent); }
+    .feat-title { font-weight: 700; font-size: .97rem; margin-bottom: .3rem; }
+    .feat-desc { color: var(--muted); font-size: .875rem; line-height: 1.55; }
+
+    /* steps */
+    .steps { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 3rem; max-width: 660px; }
+    .step { display: flex; gap: 1.25rem; align-items: flex-start; }
+    .step-num {
+      flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      font-weight: 800; font-size: .9rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-body { padding-top: .35rem; }
+    .step-title { font-weight: 700; font-size: .97rem; margin-bottom: .2rem; }
+    .step-desc { color: var(--muted); font-size: .875rem; }
+    .step-desc a { color: var(--accent); }
+
+    /* req pills */
+    .req-row { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+    .req-pill {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 999px; padding: .45rem 1rem;
+      font-size: .875rem; display: flex; align-items: center; gap: .5rem;
+    }
+    .req-pill svg { width: 15px; height: 15px; color: var(--accent); flex-shrink: 0; }
+
+    /* template showcase */
+    .tmpl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 2rem; }
+    .tmpl-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.1rem 1.25rem;
+    }
+    .tmpl-label { font-size: .75rem; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: .06em; margin-bottom: .5rem; }
+    .tmpl-code { font-family: 'Cascadia Code','Consolas',monospace; font-size: .85rem; color: #a0aaff; }
+    .tmpl-arrow { color: var(--muted); margin: 0 .25rem; }
+    .tmpl-result { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .tmpl-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html"><span>Custom</span>RP</a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#start">Get Started</a></li>
+    <li><a href="docs.html">Docs</a></li>
+    <li><a href="https://github.com/aogunwoolu/Discord-CustomRP" target="_blank">GitHub</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="badge">Open Source &amp; Free Forever</div>
+  <h1>Custom <em>Rich Presence</em><br/>for Discord</h1>
+  <p class="hero-sub">
+    Set fully custom Discord statuses, auto-detect running apps,
+    live-update from browser URLs &amp; window titles, and show multiple
+    presences simultaneously — no coding required.
+  </p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="https://github.com/aogunwoolu/Discord-CustomRP/releases/latest">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Zm-1-5.47 3.22 3.22a.749.749 0 0 0 1.06 0l3.22-3.22a.749.749 0 1 0-1.06-1.06L8.5 8.69V2.75a.75.75 0 0 0-1.5 0v5.94L5.81 7.47a.749.749 0 1 0-1.06 1.06Z"/></svg>
+      Download for Windows
+    </a>
+    <a class="btn btn-ghost" href="docs.html">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.006 1h4.245a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.507a2.25 2.25 0 0 0-1.591.659l-.622.621a.75.75 0 0 1-1.06 0l-.622-.621A2.25 2.25 0 0 0 5.258 13H.75a.75.75 0 0 1-.75-.75Zm7.251 10.324.004-5.073-.002-2.253A2.25 2.25 0 0 0 5.003 2.5H1.5v9h3.757a3.75 3.75 0 0 1 1.994.574ZM8.755 4.75l-.004 7.322a3.752 3.752 0 0 1 1.992-.572H14.5v-9h-3.495a2.25 2.25 0 0 0-2.25 2.25Z"/></svg>
+      Read the Docs
+    </a>
+    <a class="btn btn-ghost" href="https://github.com/aogunwoolu/Discord-CustomRP" target="_blank">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+  <p class="hero-note">Windows 10 or later &nbsp;·&nbsp; Requires .NET 10 Runtime &nbsp;·&nbsp; Free forever</p>
+</section>
+
+<!-- PRESENCE PREVIEW -->
+<div class="preview-wrap">
+  <div class="presence-card">
+    <div class="p-img">
+      <div class="p-large">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1ZM8 14H6v-4h2Zm4 0h-2v-4h2Zm4 0h-2v-4h2Z"/></svg>
+      </div>
+      <div class="p-small">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm-1 14H9V8h2v8Zm4 0h-2V8h2v8Z"/></svg>
+      </div>
+    </div>
+    <div class="p-text">
+      <div class="p-type">Playing a game</div>
+      <div class="p-name">My Awesome Game</div>
+      <div class="p-detail">Level 42 &nbsp;·&nbsp; Chapter 7</div>
+      <div class="p-time"><span class="p-dot"></span>1:23 elapsed</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURES ── -->
+<section id="features" class="landing alt">
+  <div class="section-inner">
+    <div class="section-eyebrow">What it does</div>
+    <h2 class="section-title">Everything you need to control your Discord status</h2>
+    <p class="section-sub">One app to manage all your Discord Rich Presence activities — no coding, no config files, no extensions.</p>
+
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.006 1h4.245a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.507a2.25 2.25 0 0 0-1.591.659l-.622.621a.75.75 0 0 1-1.06 0l-.622-.621A2.25 2.25 0 0 0 5.258 13H.75a.75.75 0 0 1-.75-.75Zm7.251 10.324.004-5.073-.002-2.253A2.25 2.25 0 0 0 5.003 2.5H1.5v9h3.757a3.75 3.75 0 0 1 1.994.574ZM8.755 4.75l-.004 7.322a3.752 3.752 0 0 1 1.992-.572H14.5v-9h-3.495a2.25 2.25 0 0 0-2.25 2.25Z"/></svg>
+        </div>
+        <div class="feat-title">Preset Library</div>
+        <div class="feat-desc">Hundreds of pre-configured known apps — games, browsers, music players, IDEs and more. One click to load and connect.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6.02 5.678A.25.25 0 0 1 6 5.5c0-.138.112-.25.25-.25a.25.25 0 0 1 .25.25.25.25 0 0 1-.48.178ZM5 11.25a.25.25 0 0 0 .5 0V9.395l.5-.5v2.355a.25.25 0 0 0 .5 0V8.39l.5-.5v3.36a.25.25 0 0 0 .5 0V7.39L7 8V5.5a.5.5 0 0 0-.5-.5H5.5A.5.5 0 0 0 5 5.5v5.75ZM8 1.5C4.41 1.5 1.5 4.41 1.5 8S4.41 14.5 8 14.5 14.5 11.59 14.5 8 11.59 1.5 8 1.5ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Z"/></svg>
+        </div>
+        <div class="feat-title">Auto-Detect</div>
+        <div class="feat-desc">Scans all running processes and matches them against the known-app library. Hit <em>Use</em> and the editor is pre-filled instantly.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 2.75a.25.25 0 0 1 .25-.25h12.5a.25.25 0 0 1 .25.25v8.5a.25.25 0 0 1-.25.25H8.07l-2.573 2.573A1.458 1.458 0 0 1 3 13.543V11.5H1.75a.25.25 0 0 1-.25-.25Zm.25-1.75A1.75 1.75 0 0 0 0 2.75v8.5C0 12.216.784 13 1.75 13H2v.543a2.958 2.958 0 0 0 5.048 2.09l2.497-2.497A1.75 1.75 0 0 0 14.25 11.5h-2.5v.25A1.75 1.75 0 0 0 13.5 13.5h.75a.75.75 0 0 0 0-1.5H13.5a.25.25 0 0 1-.25-.25V13H13a2.25 2.25 0 0 0 2.25-2.25v-8A2.25 2.25 0 0 0 13 .5H3A2.25 2.25 0 0 0 .75 2.75v.5Z"/></svg>
+        </div>
+        <div class="feat-title">Live Auto-Update</div>
+        <div class="feat-desc">Polls a process at a configurable interval, reads the window title or browser URL, and pushes it to Discord in real time.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm4.879-2.773 4.264 2.559a.25.25 0 0 1 0 .428l-4.264 2.559A.25.25 0 0 1 6 10.559V5.442a.25.25 0 0 1 .379-.215Z"/></svg>
+        </div>
+        <div class="feat-title">Favicon as Small Image</div>
+        <div class="feat-desc">When browsing, the current site's icon is automatically fetched and displayed as the small image badge on your presence.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.75 1h8.5c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 10.25 10H7.063l-2.573 2.573A1.458 1.458 0 0 1 2 11.543V10h-.25A1.75 1.75 0 0 1 0 8.25v-5.5C0 1.784.784 1 1.75 1ZM1.5 2.75v5.5c0 .138.112.25.25.25h1a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h3.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25h-8.5a.25.25 0 0 0-.25.25Zm13 2a.25.25 0 0 0-.25-.25h-.5a.75.75 0 0 1 0-1.5h.5c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 14.25 12H14v1.543a1.458 1.458 0 0 1-2.487 1.03L9.22 12.28a.749.749 0 1 1 1.06-1.06l2.22 2.22v-2.19a.75.75 0 0 1 .75-.75h1a.25.25 0 0 0 .25-.25v-5.5Z"/></svg>
+        </div>
+        <div class="feat-title">Multiple Presences</div>
+        <div class="feat-desc">Each preset can use its own Discord Application ID so they stack in Discord's Activity Shelf without replacing each other.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v8.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 11V2.5Zm1.5 0a.5.5 0 0 0-.5.5V11a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5V2.5a.5.5 0 0 0-.5-.5h-11ZM4.5 14.5h7a.75.75 0 0 0 0-1.5h-7a.75.75 0 0 0 0 1.5Z"/></svg>
+        </div>
+        <div class="feat-title">Template Variables</div>
+        <div class="feat-desc">Use <code>{title}</code>, <code>{url}</code>, <code>{host}</code>, <code>{path}</code> and more in any text field to inject live data from the tracked process.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm7-3.25v2.992l2.028.812a.75.75 0 0 1-.557 1.392l-2.5-1A.751.751 0 0 1 7 8.25v-3.5a.75.75 0 0 1 1.5 0Z"/></svg>
+        </div>
+        <div class="feat-title">Activity Shelf Timestamps</div>
+        <div class="feat-desc">Show elapsed time, remaining time, or a custom start/end timestamp. Discord renders the timer automatically.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M10.561 8.073a6.005 6.005 0 0 1 3.432 5.142.75.75 0 1 1-1.498.07 4.5 4.5 0 0 0-8.99 0 .75.75 0 0 1-1.498-.07 6.004 6.004 0 0 1 3.431-5.142 3.999 3.999 0 1 1 5.123 0ZM10.5 5a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"/></svg>
+        </div>
+        <div class="feat-title">Startup Restoration</div>
+        <div class="feat-desc">Active presences are saved to disk and reconnected automatically the next time you open the app — no manual reconnecting needed.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── TEMPLATE SHOWCASE ── -->
+<section class="landing">
+  <div class="section-inner">
+    <div class="section-eyebrow">Auto-Update</div>
+    <h2 class="section-title">Dynamic presence from live browser data</h2>
+    <p class="section-sub">Template variables pull real-time data from the window title or browser URL and inject it into any presence field.</p>
+
+    <div class="tmpl-grid">
+      <div class="tmpl-card">
+        <div class="tmpl-label">Details template</div>
+        <span class="tmpl-code">Browsing {host}</span>
+        <span class="tmpl-arrow">→</span>
+        <span class="tmpl-result">Browsing github.com</span>
+      </div>
+      <div class="tmpl-card">
+        <div class="tmpl-label">State template</div>
+        <span class="tmpl-code">{title}</span>
+        <span class="tmpl-arrow">→</span>
+        <span class="tmpl-result">discord-customrp/README.md</span>
+      </div>
+      <div class="tmpl-card">
+        <div class="tmpl-label">Button URL</div>
+        <span class="tmpl-code">{url}</span>
+        <span class="tmpl-arrow">→</span>
+        <span class="tmpl-result">https://github.com/user/repo</span>
+      </div>
+      <div class="tmpl-card">
+        <div class="tmpl-label">State template</div>
+        <span class="tmpl-code">Port {port} · {path}</span>
+        <span class="tmpl-arrow">→</span>
+        <span class="tmpl-result">Port 3000 · /dashboard</span>
+      </div>
+    </div>
+
+    <p style="margin-top:1.25rem">
+      <a href="docs.html#templates">See all template variables →</a>
+    </p>
+  </div>
+</section>
+
+<!-- ── GET STARTED ── -->
+<section id="start" class="landing alt">
+  <div class="section-inner">
+    <div class="section-eyebrow">Get Started</div>
+    <h2 class="section-title">Up and running in under a minute</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Download &amp; Extract</div>
+          <div class="step-desc">Grab the latest <code>.zip</code> from the <a href="https://github.com/aogunwoolu/Discord-CustomRP/releases/latest">Releases page</a>. Extract <code>CustomRP.Modern.exe</code> anywhere. Install the <a href="https://dotnet.microsoft.com/download/dotnet/10.0" target="_blank">.NET 10 Desktop Runtime</a> if prompted.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Pick an App or Start Fresh</div>
+          <div class="step-desc">The <strong>Preset Library</strong> opens by default. Search for any app and hit <em>Load</em>, or open the <strong>Editor</strong> tab to configure something custom.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Click Connect</div>
+          <div class="step-desc">A Discord Application ID is pre-filled as the default. Click <strong>Connect</strong> — your presence goes live immediately in Discord.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">(Optional) Enable Auto-Update</div>
+          <div class="step-desc">Turn on <em>Auto-update</em> in the editor. Select <strong>Browser URL</strong> strategy and enable <em>Use website favicon as small image</em> to get a live favicon alongside the page title.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem">
+      <a class="btn btn-primary" href="docs.html">Full Documentation →</a>
+    </div>
+
+    <div class="req-row" style="margin-top:2.5rem">
+      <div style="width:100%;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.25rem;">Requirements</div>
+      <div class="req-pill">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 2.75A.75.75 0 0 1 .75 2h14.5a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75H.75a.75.75 0 0 1-.75-.75Zm1.5.75v9h13V3.5Z"/></svg>
+        Windows 10 or later (x64)
+      </div>
+      <div class="req-pill">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8.878.392a1.75 1.75 0 0 0-1.756 0l-5.25 3.045A1.75 1.75 0 0 0 1 4.951v6.098c0 .624.332 1.2.872 1.514l5.25 3.045a1.75 1.75 0 0 0 1.756 0l5.25-3.045c.54-.313.872-.89.872-1.514V4.951c0-.624-.332-1.2-.872-1.514ZM7.875 1.69a.25.25 0 0 1 .25 0l4.63 2.685L8 7.133 3.245 4.375ZM2.5 5.677l4.75 2.763v5.142l-4.623-2.684A.25.25 0 0 1 2.5 10.63Zm6.25 7.905v-5.142l4.75-2.763v4.951a.25.25 0 0 1-.127.217Z"/></svg>
+        .NET 10 Desktop Runtime
+      </div>
+      <div class="req-pill">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M10.561 8.073a6.005 6.005 0 0 1 3.432 5.142.75.75 0 1 1-1.498.07 4.5 4.5 0 0 0-8.99 0 .75.75 0 0 1-1.498-.07 6.004 6.004 0 0 1 3.431-5.142 3.999 3.999 0 1 1 5.123 0ZM10.5 5a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"/></svg>
+        Discord desktop app
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <p>
+    <strong>CustomRP.Modern</strong> &nbsp;·&nbsp;
+    Fork of <a href="https://www.customrp.xyz" target="_blank">customrp.xyz</a> by maximmax42 &nbsp;·&nbsp;
+    <a href="https://github.com/aogunwoolu/Discord-CustomRP" target="_blank">Source on GitHub</a> &nbsp;·&nbsp;
+    <a href="docs.html#privacy">Privacy</a> &nbsp;·&nbsp;
+    <a href="https://github.com/aogunwoolu/Discord-CustomRP/blob/master/LICENSE" target="_blank">License</a>
+  </p>
+  <p style="margin-top:.4rem;font-size:.78rem;">Not affiliated with Discord Inc.</p>
+</footer>
+
+</body>
+</html>

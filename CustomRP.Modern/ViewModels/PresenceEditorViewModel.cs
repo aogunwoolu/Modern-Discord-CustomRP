@@ -61,12 +61,10 @@ public partial class PresenceEditorViewModel : ViewModelBase
     [ObservableProperty] private string _presetDescription = "";
     [ObservableProperty] private string _presetCategory = "";
 
-    /// <summary>Category options available in the editor's category picker —
-    /// "(none)" plus every key the user has configured in Settings.</summary>
-    public IReadOnlyList<string> CategoryOptions =>
-        new[] { "(none)" }
-            .Concat(_services.Settings.Current.CategoryClientIds.Keys.OrderBy(k => k))
-            .ToList();
+    /// <summary>Category options available in the editor's category picker.</summary>
+    public IReadOnlyList<string> CategoryOptions { get; } =
+        new[] { "(none)", "Browsers", "Communication", "Creative", "Development",
+                "Games", "Launchers", "Music", "Productivity", "Video" };
 
     [ObservableProperty] private string _connectButtonLabel = "Connect";
     [ObservableProperty] private bool _isConnected;
@@ -120,14 +118,8 @@ public partial class PresenceEditorViewModel : ViewModelBase
             Avalonia.Threading.Dispatcher.UIThread.Post(SyncConnectionState);
         };
 
-        // Adopt any connection that already exists for this ClientId when the
-        // app restores active presets on startup (before the editor had a chance
-        // to set _connectedPreset via ToggleConnection).
-        services.Connections.ConnectionAdded += (_, conn) =>
-        {
-            if (_connectedPreset is null && conn.ClientId == EffectiveClientId)
-                _connectedPreset = conn.Preset;
-        };
+        // Connections are restored before editors are created (see App.axaml.cs),
+        // so startup adoption is handled in LoadPreset via Find() — no race here.
 
         services.AutoUpdate.Updated += (_, snapshot) =>
         {
@@ -312,6 +304,16 @@ public partial class PresenceEditorViewModel : ViewModelBase
         EffectiveButton2Url = Button2Url;
 
         IsDirty = false;
+
+        // Adopt the pre-existing connection if this preset was active when the app
+        // last closed. Connections are started before editors are created, so Find()
+        // returns the live connection immediately. Match on DisplayName to avoid
+        // stealing a connection that belongs to a different preset with the same ClientId.
+        var expectedName = string.IsNullOrWhiteSpace(preset.Metadata.Name) ? "Editor" : preset.Metadata.Name;
+        var existing = _services.Connections.Find(EffectiveClientId);
+        if (existing is not null && existing.DisplayName == expectedName)
+            _connectedPreset = existing.Preset;
+
         SyncConnectionState(); // Refresh Connect/Disconnect and ClientIdSourceLabel for the new preset.
     }
 
@@ -408,27 +410,32 @@ public partial class PresenceEditorViewModel : ViewModelBase
     partial void OnClientIdChanged(string value) => SyncConnectionState();
 
     /// <summary>
-    /// The Client ID that will actually be used when connecting. Category setting
-    /// takes priority over the per-preset ClientId field.
+    /// The Client ID that will actually be used when connecting.
+    /// Uses the preset's own ClientId if set, otherwise the global default from Settings.
     /// </summary>
-    private string EffectiveClientId
+    private string EffectiveClientId =>
+        string.IsNullOrWhiteSpace(ClientId)
+            ? (_services.Settings.Current.DefaultClientId is { Length: > 0 } d ? d : PresencePayloadBuilder.DefaultClientId)
+            : ClientId.Trim();
+
+    private RpcConnection? EditorConnection
     {
         get
         {
-            var category = CurrentCategory;
-            if (!string.IsNullOrEmpty(category)
-                && _services.Settings.Current.CategoryClientIds.TryGetValue(category, out var catId)
-                && !string.IsNullOrWhiteSpace(catId))
-                return catId.Trim();
-
-            return string.IsNullOrWhiteSpace(ClientId)
-                ? PresencePayloadBuilder.DefaultClientId
-                : ClientId.Trim();
+            // When we own a connection, find it by the exact Preset reference —
+            // this handles the case where ConnectionManager auto-assigned a slot
+            // ID that differs from EffectiveClientId (e.g. default ID already taken).
+            if (_connectedPreset is not null)
+            {
+                var byRef = _services.Connections.Connections
+                    .FirstOrDefault(c => ReferenceEquals(c.Preset, _connectedPreset));
+                if (byRef is not null) return byRef;
+            }
+            // Fallback for startup-adopted connections and the "another editor owns
+            // this ClientId" informational path.
+            return _services.Connections.Find(EffectiveClientId);
         }
     }
-
-    private RpcConnection? EditorConnection =>
-        _services.Connections.Find(EffectiveClientId);
 
     private void SyncConnectionState()
     {
@@ -440,15 +447,9 @@ public partial class PresenceEditorViewModel : ViewModelBase
         ConnectButtonLabel = IsConnected ? "Disconnect" : "Connect";
 
         // Explain which Client ID is in use.
-        var category = Preset?.Metadata?.Category ?? "";
-        if (!string.IsNullOrEmpty(category)
-            && _services.Settings.Current.CategoryClientIds.TryGetValue(category, out var catId)
-            && !string.IsNullOrWhiteSpace(catId))
-            ClientIdSourceLabel = $"Using {category} application ID from Settings ({catId.Trim()})";
-        else
-            ClientIdSourceLabel = string.IsNullOrWhiteSpace(ClientId)
-                ? $"Using default application ID ({PresencePayloadBuilder.DefaultClientId})"
-                : $"Using custom application ID ({ClientId.Trim()})";
+        ClientIdSourceLabel = string.IsNullOrWhiteSpace(ClientId)
+            ? $"Using default application ID ({EffectiveClientId})"
+            : $"Using custom application ID ({ClientId.Trim()})";
 
         if (conn is null)
         {
@@ -530,14 +531,11 @@ public partial class PresenceEditorViewModel : ViewModelBase
             return;
         }
 
-        // Validate category Client ID is configured.
-        var category = Preset?.Metadata?.Category ?? "";
-        if (!string.IsNullOrEmpty(category)
-            && _services.Settings.Current.CategoryClientIds.TryGetValue(category, out var catId)
-            && string.IsNullOrWhiteSpace(catId))
+        // Validate that a Client ID is available.
+        if (string.IsNullOrWhiteSpace(EffectiveClientId))
         {
             LastSentIsError = true;
-            LastSentLabel = $"Set a Client ID for \u2018{category}\u2019 in Settings \u2192 Discord Applications, then click Save changes.";
+            LastSentLabel = "Set a Discord Application Client ID in the editor or in Settings \u2192 Default Client ID.";
             return;
         }
 

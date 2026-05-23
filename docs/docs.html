@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation — CustomRP</title>
+  <meta name="description" content="Full documentation for CustomRP — installation, auto-update, templates, multi-presence, and troubleshooting." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="nav">
+    <a class="nav-logo" href="index.html"><span>Custom</span>RP</a>
+    <ul class="nav-links">
+      <li><a href="index.html#features">Features</a></li>
+      <li><a href="docs.html" class="active">Docs</a></li>
+      <li><a href="https://github.com/aogunwoolu/Discord-CustomRP" target="_blank">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <div class="docs-layout">
+    <!-- sidebar -->
+    <aside class="docs-sidebar">
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <div class="docs-nav-label">Getting Started</div>
+          <a href="#install">Installation</a>
+          <a href="#first-run">First Run</a>
+          <a href="#editor">The Editor</a>
+        </div>
+        <div class="docs-nav-group">
+          <div class="docs-nav-label">Features</div>
+          <a href="#preset-library">Preset Library</a>
+          <a href="#auto-update">Auto-Update</a>
+          <a href="#templates">Template Variables</a>
+          <a href="#favicon">Favicon as Image</a>
+          <a href="#multi">Multiple Presences</a>
+          <a href="#active-panel">Active Presences</a>
+        </div>
+        <div class="docs-nav-group">
+          <div class="docs-nav-label">Configuration</div>
+          <a href="#settings">Settings</a>
+          <a href="#presets-files">Preset Files</a>
+          <a href="#known-apps">Known Apps</a>
+        </div>
+        <div class="docs-nav-group">
+          <div class="docs-nav-label">Reference</div>
+          <a href="#troubleshoot">Troubleshooting</a>
+          <a href="#faq">FAQ</a>
+          <a href="#privacy">Privacy</a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- content -->
+    <main class="docs-content">
+
+      <h1>Documentation</h1>
+      <p class="docs-intro">Complete reference for CustomRP — a modern Discord Rich Presence manager built on Avalonia 11.</p>
+
+      <!-- ── Getting Started ── -->
+      <section id="install">
+        <h2>Installation</h2>
+        <h3>Requirements</h3>
+        <ul>
+          <li>Windows 10 or later (x64)</li>
+          <li><a href="https://dotnet.microsoft.com/download/dotnet/10.0" target="_blank">.NET 10 Desktop Runtime</a></li>
+          <li>Discord desktop app running on the same machine</li>
+        </ul>
+        <h3>Download</h3>
+        <p>Grab the latest <code>CustomRP.Modern-vX.X.X-win-x64.zip</code> from the <a href="https://github.com/aogunwoolu/Discord-CustomRP/releases/latest" target="_blank">Releases page</a>, extract the zip, and run <code>CustomRP.Modern.exe</code>. No installer needed.</p>
+        <div class="callout callout-tip">
+          <div class="callout-icon">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1Zm0 3a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0V5a1 1 0 0 0-1-1Zm0 7.25a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z"/></svg>
+          </div>
+          <div><strong>Tip:</strong> Windows may show a SmartScreen warning on first run because the binary is unsigned. Click <em>More info → Run anyway</em>.</div>
+        </div>
+      </section>
+
+      <section id="first-run">
+        <h2>First Run</h2>
+        <ol>
+          <li>Open the app. The <strong>Preset Library</strong> tab opens by default.</li>
+          <li>Search for any app (game, browser, IDE) or switch to the <strong>Editor</strong> tab to start from scratch.</li>
+          <li>A Discord Application Client ID is pre-filled. Click <strong>Connect</strong> — your presence goes live immediately.</li>
+          <li>To verify, click your avatar in Discord and look for the activity in the <em>Activity Shelf</em>.</li>
+        </ol>
+      </section>
+
+      <section id="editor">
+        <h2>The Editor</h2>
+        <p>The Editor tab lets you configure every field of a Discord Rich Presence activity.</p>
+        <table>
+          <thead><tr><th>Field</th><th>Description</th><th>Limit</th></tr></thead>
+          <tbody>
+            <tr><td>Activity Name</td><td>Shown as the bold title in Discord</td><td>128 chars</td></tr>
+            <tr><td>Details</td><td>First line below the title</td><td>128 chars</td></tr>
+            <tr><td>State</td><td>Second line below details</td><td>128 chars</td></tr>
+            <tr><td>Large Image</td><td>Main square image — portal asset name or HTTPS URL</td><td>256 chars</td></tr>
+            <tr><td>Small Image</td><td>Circle badge overlaid on large image</td><td>256 chars</td></tr>
+            <tr><td>Button 1/2</td><td>Clickable links shown on the presence card</td><td>Label 32, URL 512</td></tr>
+            <tr><td>Timestamps</td><td>Elapsed / remaining timer</td><td>—</td></tr>
+            <tr><td>Party</td><td>Current/max count (e.g. 2/5 players)</td><td>—</td></tr>
+          </tbody>
+        </table>
+        <h3>Client ID</h3>
+        <p>The <strong>Discord Application Client ID</strong> field identifies which Discord Application your presence connects through. Leave it blank to use the global default from Settings. Set a unique ID here to show this presence simultaneously with others — Discord displays one activity per Application ID.</p>
+        <p>Create free applications at <a href="https://discord.com/developers/applications" target="_blank">discord.com/developers/applications</a>.</p>
+      </section>
+
+      <!-- ── Features ── -->
+      <section id="preset-library">
+        <h2>Preset Library</h2>
+        <p>The library ships with hundreds of pre-configured known apps. Each entry includes the activity name, large image URL, and category. Click <strong>Load</strong> to copy the preset into the Editor, then <strong>Connect</strong>.</p>
+        <p>You can also save your own presets to the library via <strong>Editor → Save to library</strong>. User presets live in <code>%APPDATA%\CustomRP.Modern\presets</code>.</p>
+        <h3>Auto-Detect</h3>
+        <p>The <strong>Detect</strong> button scans all running processes and shows any that match the known-app library. Click <strong>Use</strong> next to any result to pre-fill the editor.</p>
+      </section>
+
+      <section id="auto-update">
+        <h2>Auto-Update</h2>
+        <p>Enable <strong>Auto-update</strong> in the Editor to have the presence update automatically as the tracked process changes.</p>
+        <table>
+          <thead><tr><th>Option</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Process name</td><td>Executable name to watch, e.g. <code>zen</code> or <code>chrome</code> (without <code>.exe</code>)</td></tr>
+            <tr><td>Strategy</td><td><strong>Window Title</strong> — reads the window title bar. <strong>Browser URL</strong> — reads the address bar via UI Automation (Chromium/Gecko)</td></tr>
+            <tr><td>Interval (s)</td><td>How often to poll the process. Default 5 s. Minimum 1 s.</td></tr>
+            <tr><td>Use favicon</td><td>Automatically fetch and display the current site's favicon as the small image</td></tr>
+          </tbody>
+        </table>
+        <h3>Browser URL Reading</h3>
+        <p>For <strong>Chromium</strong>-based browsers (Chrome, Edge, Brave, Arc, Thorium) CustomRP reads the address bar via the Windows UI Automation API — no extension needed.</p>
+        <p>For <strong>Gecko</strong>-based browsers (Firefox, LibreWolf, Zen Browser) CustomRP tries UI Automation first, then falls back to reading the session recovery file (<code>recovery.jsonlz4</code>) directly from the browser's profile directory. This file is updated roughly every 15 seconds by the browser.</p>
+        <div class="callout callout-warn">
+          <div class="callout-icon">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8.22 1.754a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368L8.22 1.754ZM9 11H7V9h2v2Zm0-3H7V5h2v3Z"/></svg>
+          </div>
+          <div><strong>Note:</strong> Some Gecko builds with strict process isolation may prevent UI Automation from reading the URL bar. The session-file fallback handles this automatically but has up to a 15 s lag.</div>
+        </div>
+      </section>
+
+      <section id="templates">
+        <h2>Template Variables</h2>
+        <p>When Auto-update is on, use these placeholders in <strong>Details</strong>, <strong>State</strong>, or <strong>Button</strong> fields. Both <code>{var}</code> and <code>{{var}}</code> syntax are accepted. Values longer than 128 characters are trimmed.</p>
+        <table>
+          <thead><tr><th>Variable</th><th>Value</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td><code>{title}</code></td><td>Window / tab title</td><td><code>GitHub - Home</code></td></tr>
+            <tr><td><code>{url}</code></td><td>Full URL (browser strategy)</td><td><code>https://github.com/user/repo</code></td></tr>
+            <tr><td><code>{host}</code></td><td>Domain only</td><td><code>github.com</code></td></tr>
+            <tr><td><code>{path}</code></td><td>URL path</td><td><code>/user/repo</code></td></tr>
+            <tr><td><code>{scheme}</code></td><td>Protocol</td><td><code>https</code></td></tr>
+            <tr><td><code>{query}</code></td><td>Query string (without <code>?</code>)</td><td><code>q=search</code></td></tr>
+            <tr><td><code>{port}</code></td><td>Port number (empty if default)</td><td><code>3000</code></td></tr>
+            <tr><td><code>{process}</code></td><td>Process name</td><td><code>chrome</code></td></tr>
+          </tbody>
+        </table>
+        <h3>Example templates</h3>
+        <div class="code-block"><pre>Details:  Browsing {host}
+State:    {title}
+Button 1: Open page | {url}</pre></div>
+      </section>
+
+      <section id="favicon">
+        <h2>Favicon as Small Image</h2>
+        <p>When <strong>Use website favicon as small image</strong> is checked, CustomRP automatically fetches the current site's icon and uses it as the presence small image.</p>
+        <h3>How it works</h3>
+        <ol>
+          <li>CustomRP reads the current URL from the browser.</li>
+          <li>The favicon is fetched via <strong>wsrv.nl</strong> — a public image CDN — which converts ICO files to PNG and serves them from a domain Discord's media proxy can reach.</li>
+          <li>If a <strong>Katsau API key</strong> is configured in Settings, the Katsau service is used instead to parse the page HTML and find the highest-quality icon available.</li>
+        </ol>
+        <p>The first update cycle after connecting may show no image while the favicon resolves. It appears automatically within one interval (default 5 s).</p>
+        <div class="callout callout-tip">
+          <div class="callout-icon">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1Zm0 3a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0V5a1 1 0 0 0-1-1Zm0 7.25a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z"/></svg>
+          </div>
+          <div>Get a free Katsau API key at <a href="https://katsau.com" target="_blank">katsau.com</a> for better favicon quality on sites with non-standard icon setups.</div>
+        </div>
+      </section>
+
+      <section id="multi">
+        <h2>Multiple Presences</h2>
+        <p>Discord displays one activity per <strong>Discord Application ID</strong>. If two presences share the same ID, the newer one replaces the older one in your profile.</p>
+        <p>To show multiple presences simultaneously (e.g. a game and a browser tab):</p>
+        <ol>
+          <li>Go to <a href="https://discord.com/developers/applications" target="_blank">discord.com/developers/applications</a>.</li>
+          <li>Create a new Application for each presence you want to run in parallel. Name them anything — the name is not visible to Discord friends.</li>
+          <li>Copy the <strong>Application ID</strong> from the General Information page.</li>
+          <li>In the CustomRP Editor, paste the ID into the <strong>Discord Application Client ID</strong> field for each preset.</li>
+          <li>Connect each one. They will appear as separate entries in Discord's Activity Shelf.</li>
+        </ol>
+        <div class="callout callout-tip">
+          <div class="callout-icon">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1Zm0 3a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0V5a1 1 0 0 0-1-1Zm0 7.25a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z"/></svg>
+          </div>
+          <div>You can create up to 25 free Discord Applications per account. A global <strong>Default Client ID</strong> can be set in Settings as a fallback for presets that don't specify their own.</div>
+        </div>
+      </section>
+
+      <section id="active-panel">
+        <h2>Active Presences Panel</h2>
+        <p>The <strong>Active Presences</strong> tab shows all live connections at a glance: connection state, Discord username, and the last payload sent. From here you can:</p>
+        <ul>
+          <li>Reconnect a dropped connection without opening the editor.</li>
+          <li>Stop individual presences independently.</li>
+          <li>See at a glance what Discord is currently displaying for each app.</li>
+        </ul>
+        <p>CustomRP saves the active set to disk on change, so connections are <strong>automatically restored</strong> the next time the app starts.</p>
+      </section>
+
+      <!-- ── Configuration ── -->
+      <section id="settings">
+        <h2>Settings</h2>
+        <table>
+          <thead><tr><th>Setting</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Theme</td><td>Dark, Light, or custom theme (Midnight, Ocean, Rose, Forest, Nord)</td></tr>
+            <tr><td>Pipe number</td><td>Discord IPC pipe (-1 = auto). Change if you run multiple Discord clients (Stable / Canary / PTB)</td></tr>
+            <tr><td>Auto-reconnect</td><td>Automatically reconnect when Discord restarts</td></tr>
+            <tr><td>Minimize to tray</td><td>Closing the window sends the app to the system tray</td></tr>
+            <tr><td>Katsau API Key</td><td>Optional key for high-quality favicon resolution</td></tr>
+            <tr><td>Default Client ID</td><td>Fallback Discord Application ID for presets that don't specify their own</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="presets-files">
+        <h2>Preset Files</h2>
+        <p>Presets are stored as <code>.crpreset</code> files (JSON). Legacy <code>.crp</code> (XML) files from older CustomRP versions can also be imported.</p>
+        <h3>User preset directory</h3>
+        <div class="code-block"><pre>%APPDATA%\CustomRP.Modern\presets\</pre></div>
+        <h3>File format overview</h3>
+        <div class="code-block"><pre>{
+  "clientId": "123456789012345678",
+  "activityName": "My Game",
+  "details": "Level {title}",
+  "state": "Online",
+  "largeImage": { "key": "https://...", "text": "Playing" },
+  "smallImage": { "key": "", "text": "" },
+  "buttons": [{ "text": "Watch", "url": "https://..." }],
+  "autoUpdate": {
+    "enabled": true,
+    "strategy": "WindowTitle",
+    "processName": "mygame",
+    "intervalSeconds": 5
+  }
+}</pre></div>
+      </section>
+
+      <section id="known-apps">
+        <h2>Known Apps</h2>
+        <p>The built-in preset library is driven by <code>known-apps.json</code> bundled inside the executable. Each entry defines:</p>
+        <table>
+          <thead><tr><th>Field</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>name</code></td><td>Display name in the library</td></tr>
+            <tr><td><code>processNames</code></td><td>Executable names used by Auto-Detect</td></tr>
+            <tr><td><code>category</code></td><td>Library grouping (Games, Browsers, Music, etc.)</td></tr>
+            <tr><td><code>clientId</code></td><td>Optional per-app Discord Application ID override</td></tr>
+            <tr><td><code>preset</code></td><td>Default editor values (images, details template, etc.)</td></tr>
+          </tbody>
+        </table>
+        <p>To contribute a new app, open a pull request editing <code>CustomRP.Modern/Assets/known-apps.json</code>.</p>
+      </section>
+
+      <!-- ── Reference ── -->
+      <section id="troubleshoot">
+        <h2>Troubleshooting</h2>
+
+        <h3>Presence not showing in Discord</h3>
+        <ol>
+          <li>Make sure Discord is running (desktop app, not browser).</li>
+          <li>Check <strong>Settings → Diagnostics</strong> in CustomRP for the RPC log path. Open the log to see connection events.</li>
+          <li>In Discord go to <strong>Settings → Activity Privacy</strong> and ensure "Display current activity" is enabled.</li>
+          <li>If another app (e.g. a game with native Rich Presence) is running, it may override yours. Disable its integration in Discord or close it.</li>
+        </ol>
+
+        <h3>Only one presence shows in Discord</h3>
+        <p>Discord stacks multiple activities in the <strong>Activity Shelf</strong> — click your own avatar to see all of them. The status bar only shows the primary activity. Ensure each presence uses a <strong>unique Discord Application ID</strong> (see <a href="#multi">Multiple Presences</a>).</p>
+
+        <h3>Small image shows a "?" in Discord</h3>
+        <ul>
+          <li>Discord cannot load the image URL. CustomRP routes favicons through <strong>wsrv.nl</strong> which Discord can access — if you set a manual image URL, ensure it is a direct HTTPS link to a public image (no redirects required).</li>
+          <li>Portal asset names (e.g. <code>my_icon</code>) only work with images uploaded to your Discord Application in the Developer Portal under <em>Rich Presence → Art Assets</em>.</li>
+        </ul>
+
+        <h3>Browser URL not reading / wrong URL</h3>
+        <ul>
+          <li>For Chromium browsers, CustomRP uses UI Automation — ensure Discord and CustomRP are running as the same user (not one elevated).</li>
+          <li>For Zen / Firefox, the session file is read from <code>%APPDATA%\zen\Profiles\*\sessionstore-backups\recovery.jsonlz4</code>. This file updates every ~15 s.</li>
+          <li>Check the <code>auto-update.log</code> file in <code>%LOCALAPPDATA%\CustomRP.Modern\</code> for diagnostic output on every capture cycle.</li>
+        </ul>
+
+        <h3>Legacy CustomRP conflict</h3>
+        <p>Running the old CustomRP (WinForms) at the same time as CustomRP.Modern will conflict on the Discord IPC pipe. Close the legacy version first.</p>
+      </section>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+
+        <h3>Is this safe / will I get banned?</h3>
+        <p>Rich Presence is an <strong>officially documented Discord feature</strong>. CustomRP uses Discord's public IPC API exactly as described in the documentation. There is no risk of account action.</p>
+
+        <h3>Does it work without internet?</h3>
+        <p>Yes for everything except the favicon feature (which fetches images from wsrv.nl) and the Katsau API. Core presence functionality is fully local.</p>
+
+        <h3>Can I use image URLs instead of portal assets?</h3>
+        <p>Yes. Any public HTTPS image URL works in the large/small image fields. Discord proxies it through <code>mp:external</code> automatically.</p>
+
+        <h3>How do I start CustomRP with Windows?</h3>
+        <p>Add a shortcut to <code>CustomRP.Modern.exe</code> in your Startup folder:</p>
+        <div class="code-block"><pre>%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup</pre></div>
+
+        <h3>What data is collected?</h3>
+        <p>None. CustomRP stores all data locally. The only outbound connections are to Discord (IPC, local) and optionally wsrv.nl / Katsau for favicons. See the full <a href="https://github.com/aogunwoolu/Discord-CustomRP/blob/master/PRIVACY.md" target="_blank">Privacy Policy</a>.</p>
+      </section>
+
+      <section id="privacy">
+        <h2>Privacy</h2>
+        <p>CustomRP does not collect telemetry, analytics, or usage data of any kind. All configuration is stored locally at:</p>
+        <div class="code-block"><pre>%APPDATA%\CustomRP.Modern\settings.json
+%APPDATA%\CustomRP.Modern\presets\</pre></div>
+        <p>The following optional outbound connections are made only when you enable the relevant features:</p>
+        <ul>
+          <li><strong>wsrv.nl</strong> — fetches favicon images when "Use website favicon" is enabled. The current page hostname is included in the request.</li>
+          <li><strong>katsau.com</strong> — only if you configure a Katsau API key in Settings.</li>
+          <li><strong>Discord IPC</strong> — local named-pipe connection to the Discord desktop app. No network traffic; data never leaves your machine.</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="footer">
+    <p>
+      <strong>CustomRP.Modern</strong> &nbsp;·&nbsp;
+      Fork of <a href="https://www.customrp.xyz" target="_blank">customrp.xyz</a> by maximmax42 &nbsp;·&nbsp;
+      <a href="https://github.com/aogunwoolu/Discord-CustomRP" target="_blank">Source on GitHub</a> &nbsp;·&nbsp;
+      <a href="#privacy">Privacy</a> &nbsp;·&nbsp;
+      <a href="https://github.com/aogunwoolu/Discord-CustomRP/blob/master/LICENSE" target="_blank">License</a>
+    </p>
+  </footer>
+</body>
+</html>

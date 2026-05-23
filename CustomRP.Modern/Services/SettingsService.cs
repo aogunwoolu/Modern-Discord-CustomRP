@@ -17,23 +17,11 @@ public sealed class AppSettings
     public string KatsauApiKey { get; set; } = "";
 
     /// <summary>
-    /// One Discord Application Client ID per known-app category.
-    /// Replace each placeholder with a dedicated Discord Application you create at
-    /// https://discord.com/developers/applications so multiple categories can run
-    /// simultaneously without overwriting each other.
+    /// Fallback Discord Application Client ID used when a preset doesn't specify
+    /// its own. Set a unique ID per-preset in the editor to run multiple presences
+    /// simultaneously — Discord shows one activity per Application ID.
     /// </summary>
-    public Dictionary<string, string> CategoryClientIds { get; set; } = new()
-    {
-        ["Browsers"]      = "1507440289390919882",
-        ["Communication"] = "1507794956465475805",
-        ["Creative"]      = "1507795285836038267",
-        ["Development"]   = "1507795526610059386",
-        ["Games"]         = "1507795792591589436",
-        ["Launchers"]     = "1507796028361932830",
-        ["Music"]         = "1507796396378554578",
-        ["Productivity"]  = "896771305108553788",
-        ["Video"]         = "1507796978992418908",
-    };
+    public string DefaultClientId { get; set; } = "896771305108553788";
 }
 
 /// <summary>

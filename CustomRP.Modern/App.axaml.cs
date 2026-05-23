@@ -33,6 +33,11 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // Restore connections FIRST so that PresenceEditorViewModel.LoadPreset
+            // can adopt them immediately via Find() — no ConnectionAdded race needed.
+            foreach (var entry in Services.ActivePresets.Load())
+                Services.Connections.Start(entry.Preset, entry.DisplayName);
+
             _mainWindow = new MainWindow
             {
                 DataContext = new MainWindowViewModel(Services),
@@ -40,10 +45,6 @@ public partial class App : Application
             desktop.MainWindow = _mainWindow;
 
             SetupTrayIcon(desktop);
-
-            // Restore the presences that were running when the app last closed.
-            foreach (var entry in Services.ActivePresets.Load())
-                Services.Connections.Start(entry.Preset, entry.DisplayName);
 
             desktop.ShutdownRequested += (_, _) => Services.Dispose();
         }
