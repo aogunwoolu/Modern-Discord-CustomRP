@@ -1,0 +1,153 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CustomRP.Modern.ViewModels"
+             xmlns:converters="using:CustomRP.Modern.Converters"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700"
+             x:Class="CustomRP.Modern.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16" Spacing="4">
+            <TextBlock Text="Settings" Classes="h1" />
+            <TextBlock Text="Preferences for the app." Classes="muted" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Spacing="16" MaxWidth="640" HorizontalAlignment="Left">
+
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Appearance" Classes="h3" />
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Theme" Classes="label" />
+                            <ComboBox ItemsSource="{Binding Themes}"
+                                      SelectedItem="{Binding Theme}"
+                                      HorizontalAlignment="Stretch" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Discord Connection" Classes="h3" />
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Pipe number (-1 = auto)" Classes="label" />
+                            <NumericUpDown Value="{Binding DiscordPipe}" Minimum="-1" Maximum="9" Increment="1" />
+                            <TextBlock Classes="muted" FontSize="11"
+                                       Text="Change if you run multiple Discord clients (Stable / Canary / PTB)." />
+                        </StackPanel>
+                        <CheckBox Content="Reconnect automatically on Discord restart"
+                                  IsChecked="{Binding AutoReconnect}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Behaviour" Classes="h3" />
+                        <CheckBox Content="Minimize to system tray" IsChecked="{Binding MinimizeToTray}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Preset Storage" Classes="h3" />
+                        <TextBlock Text="{Binding PresetsDirectory}"
+                                   Classes="muted"
+                                   FontSize="11"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Diagnostics" Classes="h3" />
+                        <TextBlock Text="Discord RPC log" Classes="label" />
+                        <TextBlock Text="{Binding DiscordLogPath}"
+                                   Classes="muted"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   FontFamily="Consolas, Cascadia Mono, monospace" />
+                        <TextBlock Text="App startup log" Classes="label" />
+                        <TextBlock Text="{Binding StartupLogPath}"
+                                   Classes="muted"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   FontFamily="Consolas, Cascadia Mono, monospace" />
+                        <Button Content="Open logs folder"
+                                Classes="ghost"
+                                HorizontalAlignment="Left"
+                                Command="{Binding OpenLogsFolderCommand}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ── Discord Applications ─────────────────────────────── -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="Discord Applications" Classes="h3" />
+                            <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                       Text="Each category uses a separate Discord Application so multiple presences can run simultaneously. Apps in the same category replace each other." />
+                        </StackPanel>
+
+                        <!-- Setup guide -->
+                        <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                CornerRadius="6" Padding="10,10">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="How to get an Application ID" FontWeight="SemiBold" FontSize="12" />
+                                <TextBlock FontSize="11" TextWrapping="Wrap"
+                                           Text="1. Click the button below to open the Discord Developer Portal." />
+                                <TextBlock FontSize="11" TextWrapping="Wrap"
+                                           Text="2. Click New Application and give it a name (e.g. &quot;CustomRP – Games&quot;)." />
+                                <TextBlock FontSize="11" TextWrapping="Wrap"
+                                           Text="3. On the General Information page, copy the APPLICATION ID (the long number under the app name)." />
+                                <TextBlock FontSize="11" TextWrapping="Wrap"
+                                           Text="4. Paste it in the matching category field below, then click Save changes." />
+                                <TextBlock FontSize="11" TextWrapping="Wrap" Classes="muted"
+                                           Text="You can create up to 25 applications for free. Default IDs are provided — you only need to create your own if you want independent category slots." />
+                                <Button Content="Open Discord Developer Portal →"
+                                        Classes="ghost"
+                                        HorizontalAlignment="Left"
+                                        Command="{Binding OpenDevPortalCommand}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- One row per category -->
+                        <ItemsControl ItemsSource="{Binding CategoryClientIds}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:CategoryClientIdEntry">
+                                    <Grid ColumnDefinitions="28,130,*" Margin="0,3">
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding CategoryIcon}"
+                                                   FontSize="16"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Category}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="13"
+                                                   Margin="0,0,8,0" />
+                                        <TextBox Grid.Column="2"
+                                                 Text="{Binding ClientId}"
+                                                 Watermark="Application ID (18–19 digits)"
+                                                 FontFamily="Consolas, Cascadia Mono, monospace"
+                                                 FontSize="12" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Button Content="Save changes"
+                        Classes="accent"
+                        HorizontalAlignment="Left"
+                        Command="{Binding SaveCommand}" />
+
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+
+</UserControl>

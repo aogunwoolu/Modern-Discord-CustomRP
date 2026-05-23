@@ -1,0 +1,389 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CustomRP.Modern.ViewModels"
+             xmlns:m="using:CustomRP.Modern.Models"
+             xmlns:views="using:CustomRP.Modern.Views"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700"
+             x:Class="CustomRP.Modern.Views.PresenceEditorView"
+             x:DataType="vm:PresenceEditorViewModel">
+
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,360">
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,16" Spacing="4">
+            <TextBlock Text="Rich Presence Editor" Classes="h1" />
+            <TextBlock Text="Configure how your Discord status looks. Preview updates live."
+                       Classes="muted" />
+        </StackPanel>
+
+        <!-- Form -->
+        <ScrollViewer Grid.Row="1" Grid.Column="0" Padding="0,0,16,0">
+            <StackPanel Spacing="16">
+
+                <!-- Application -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Application" Classes="h3" />
+                        <!-- Client ID source info (driven by category setting) -->
+                        <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                CornerRadius="6" Padding="10,8">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{Binding ClientIdSourceLabel}"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"
+                                           Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                <TextBlock FontSize="10" TextWrapping="Wrap" Classes="muted"
+                                           Text="Category application IDs are managed in Settings &#x2192; Discord Applications." />
+                            </StackPanel>
+                        </Border>
+                        <!-- Manual override — shown when no category is set -->
+                        <StackPanel Spacing="4"
+                                    IsVisible="{Binding Preset.Metadata.Category,
+                                                        Converter={x:Static StringConverters.IsNullOrEmpty},
+                                                        FallbackValue=True}">
+                            <TextBlock Text="Discord Application Client ID (override)" Classes="label" />
+                            <TextBox Text="{Binding ClientId}" Watermark="e.g. 896771305108553788" />
+                            <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                       Text="For custom presets. Known apps use the category ID from Settings instead." />
+                        </StackPanel>
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Activity Name" Classes="label" />
+                            <TextBox Text="{Binding ActivityName}" Watermark="Shown above details" MaxLength="128" />
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,12,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Activity Type" Classes="label" />
+                                <ComboBox ItemsSource="{Binding ActivityKinds}"
+                                          SelectedItem="{Binding ActivityType}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="Display Mode" Classes="label" />
+                                <ComboBox ItemsSource="{Binding DisplayModes}"
+                                          SelectedItem="{Binding DisplayMode}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Details / State -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Text Lines" Classes="h3" />
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Details" Classes="label" />
+                            <TextBox Text="{Binding Details}" Watermark="First line" MaxLength="128" />
+                        </StackPanel>
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="State" Classes="label" />
+                            <TextBox Text="{Binding State}" Watermark="Second line" MaxLength="128" />
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,12,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Party Size" Classes="label" />
+                                <NumericUpDown Value="{Binding PartySize}" Minimum="0" Maximum="999" Increment="1" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="Party Max" Classes="label" />
+                                <NumericUpDown Value="{Binding PartyMax}" Minimum="0" Maximum="999" Increment="1" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Images -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Images" Classes="h3" />
+                        <Grid ColumnDefinitions="*,12,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Large Image Key or URL" Classes="label" />
+                                <TextBox Text="{Binding LargeImageKey}" Watermark="Portal asset name or https://image…" />
+                                <TextBlock Classes="muted" FontSize="10" TextWrapping="Wrap"
+                                           Text="Use the asset name from Discord Developer Portal → Rich Presence → Art Assets, or a direct image URL." />
+                                <TextBlock Text="Large Image Tooltip" Classes="label" Margin="0,6,0,0" />
+                                <TextBox Text="{Binding LargeImageText}" Watermark="Shown on hover" MaxLength="128" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="Small Image Key or URL" Classes="label" />
+                                <TextBox Text="{Binding SmallImageKey}" Watermark="Portal asset name or https://image…" />
+                                <TextBlock Text="Small Image Tooltip" Classes="label" Margin="0,6,0,0" />
+                                <TextBox Text="{Binding SmallImageText}" Watermark="Shown on hover" MaxLength="128" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Buttons -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Buttons (max 2)" Classes="h3" />
+                        <Grid ColumnDefinitions="*,12,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Button 1 Label" Classes="label" />
+                                <TextBox Text="{Binding Button1Text}" MaxLength="32" />
+                                <TextBlock Text="Button 1 URL" Classes="label" Margin="0,6,0,0" />
+                                <TextBox Text="{Binding Button1Url}" Watermark="https://…" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="Button 2 Label" Classes="label" />
+                                <TextBox Text="{Binding Button2Text}" MaxLength="32" />
+                                <TextBlock Text="Button 2 URL" Classes="label" Margin="0,6,0,0" />
+                                <TextBox Text="{Binding Button2Url}" Watermark="https://…" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Auto-Update -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                            <TextBlock Text="Auto-Update" Classes="h3" VerticalAlignment="Center" />
+                            <Border Background="{DynamicResource AppAccentBrush}"
+                                    CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                                <TextBlock Text="LIVE" FontSize="10" FontWeight="Bold" Foreground="White" />
+                            </Border>
+                            <ToggleSwitch IsChecked="{Binding AutoUpdateEnabled}"
+                                          OnContent="On" OffContent="Off"
+                                          HorizontalAlignment="Right" />
+                        </StackPanel>
+                        <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                   Text="Watch a running app and update your status automatically. Window title for any app; browser strategy reads the URL via accessibility APIs (Chrome, Edge, Firefox, Brave, Opera, Vivaldi)." />
+
+                        <Grid ColumnDefinitions="*,12,*" IsEnabled="{Binding AutoUpdateEnabled}">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Strategy" Classes="label" />
+                                <ComboBox ItemsSource="{Binding AutoUpdateStrategies}"
+                                          SelectedItem="{Binding AutoUpdateStrategy}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="Interval (seconds)" Classes="label" />
+                                <NumericUpDown Value="{Binding AutoUpdateInterval}" Minimum="1" Maximum="60" Increment="1" />
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Spacing="4" IsEnabled="{Binding AutoUpdateEnabled}">
+                            <TextBlock Text="Process to watch" Classes="label" />
+                            <AutoCompleteBox Text="{Binding AutoUpdateProcessName}"
+                                             ItemsSource="{Binding AutoUpdateProcessSuggestions}"
+                                             Watermark="e.g. chrome, code, devenv"
+                                             MinimumPrefixLength="0"
+                                             FilterMode="ContainsOrdinal" />
+                            <TextBlock Classes="muted" FontSize="11"
+                                       Text="Process name without the .exe. Type any name or pick a known one." />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4" IsEnabled="{Binding AutoUpdateEnabled}">
+                            <TextBlock Text="Details template" Classes="label" />
+                            <TextBox Text="{Binding AutoUpdateDetailsTemplate}"
+                                     Watermark="{}{title} or {host} or any mix" />
+                            <TextBlock Text="State template" Classes="label" Margin="0,8,0,0" />
+                            <TextBox Text="{Binding AutoUpdateStateTemplate}"
+                                     Watermark="(optional) e.g. {}{host}{path}" />
+                            <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                       Text="Variables: {title} {url} {host} {path} {scheme} {query} {process}. Both {var} and {{var}} syntax accepted. Static values above are used when auto-update is off." />
+                        </StackPanel>
+
+                        <CheckBox Content="Use website favicon as the small image (browser strategy)"
+                                  IsChecked="{Binding AutoUpdateUseFavicon}"
+                                  IsEnabled="{Binding AutoUpdateEnabled}" />
+
+                        <!-- Button templates -->
+                        <StackPanel Spacing="4" IsEnabled="{Binding AutoUpdateEnabled}">
+                            <TextBlock Text="Button templates" Classes="label" />
+                            <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                       Text="Override the static buttons above with live values. Leave both fields empty to keep the static button." />
+                            <Grid ColumnDefinitions="*,12,*">
+                                <StackPanel Grid.Column="0" Spacing="4">
+                                    <TextBlock Text="Button 1 label" Classes="label" />
+                                    <TextBox Text="{Binding AutoUpdateButton1TextTemplate}"
+                                             Watermark="e.g. Visit {host}" />
+                                    <TextBlock Text="Button 1 URL" Classes="label" Margin="0,4,0,0" />
+                                    <TextBox Text="{Binding AutoUpdateButton1UrlTemplate}"
+                                             Watermark="{}{url}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Spacing="4">
+                                    <TextBlock Text="Button 2 label" Classes="label" />
+                                    <TextBox Text="{Binding AutoUpdateButton2TextTemplate}"
+                                             Watermark="(optional)" />
+                                    <TextBlock Text="Button 2 URL" Classes="label" Margin="0,4,0,0" />
+                                    <TextBox Text="{Binding AutoUpdateButton2UrlTemplate}"
+                                             Watermark="(optional)" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Template reference -->
+                        <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                CornerRadius="6" Padding="10,8">
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="Template reference"
+                                           FontWeight="SemiBold" FontSize="11"
+                                           Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                <TextBlock FontSize="10" Foreground="{DynamicResource AppTextMutedBrush}"
+                                           Text="{}{title}    window / tab title" />
+                                <TextBlock FontSize="10" Foreground="{DynamicResource AppTextMutedBrush}"
+                                           Text="{}{url}      full URL (browser strategy)" />
+                                <TextBlock FontSize="10" Foreground="{DynamicResource AppTextMutedBrush}"
+                                           Text="{}{host}     domain  (e.g. github.com)" />
+                                <TextBlock FontSize="10" Foreground="{DynamicResource AppTextMutedBrush}"
+                                           Text="{}{path}     URL path  (e.g. /user/repo)" />
+                                <TextBlock FontSize="10" Foreground="{DynamicResource AppTextMutedBrush}"
+                                           Text="{}{scheme}   protocol  (https / http)" />
+                                <TextBlock FontSize="10" Foreground="{DynamicResource AppTextMutedBrush}"
+                                           Text="{}{query}    query string  (e.g. q=search)" />
+                                <TextBlock FontSize="10" Foreground="{DynamicResource AppTextMutedBrush}"
+                                           Text="{}{process}  process name  (e.g. chrome)" />
+                                <TextBlock FontSize="10" Foreground="{DynamicResource AppTextMutedBrush}"
+                                           Text="Both {var} and {{var}} syntax are accepted."
+                                           Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                CornerRadius="6" Padding="10,8"
+                                IsVisible="{Binding AutoUpdateEnabled}">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Ellipse Width="8" Height="8"
+                                         Fill="{DynamicResource AppSuccessBrush}" />
+                                <TextBlock Text="{Binding LiveStatusLabel}"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource AppTextSecondaryBrush}"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Timestamps -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Timestamps" Classes="h3" />
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Mode" Classes="label" />
+                            <ComboBox ItemsSource="{Binding TimestampModes}"
+                                      SelectedItem="{Binding Timestamps}"
+                                      HorizontalAlignment="Stretch" />
+                        </StackPanel>
+                        <StackPanel Spacing="8"
+                                    IsVisible="{Binding Timestamps, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static m:TimestampMode.Custom}}">
+                            <Grid ColumnDefinitions="*,12,*">
+                                <StackPanel Grid.Column="0" Spacing="4">
+                                    <TextBlock Text="Start" Classes="label" />
+                                    <CalendarDatePicker SelectedDate="{Binding CustomTimestampStart}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Spacing="4">
+                                    <TextBlock Text="End" Classes="label" />
+                                    <CalendarDatePicker SelectedDate="{Binding CustomTimestampEnd}"
+                                                        IsEnabled="{Binding CustomTimestampEndEnabled}" />
+                                </StackPanel>
+                            </Grid>
+                            <CheckBox Content="Show end timestamp"
+                                      IsChecked="{Binding CustomTimestampEndEnabled}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Preset metadata -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Preset Metadata" Classes="h3" />
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Preset Name" Classes="label" />
+                            <TextBox Text="{Binding PresetName}" />
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,12,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Author" Classes="label" />
+                                <TextBox Text="{Binding PresetAuthor}" Watermark="Your name or handle" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="Description" Classes="label" />
+                                <TextBox Text="{Binding PresetDescription}" Watermark="What is this preset for?" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Right pane: preview + actions -->
+        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="16">
+
+            <!-- Sticky preview -->
+            <Border Classes="card-elevated" Background="{DynamicResource AppDiscordCardBrush}">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="LIVE PREVIEW" FontSize="10" FontWeight="Bold"
+                               Foreground="{DynamicResource AppTextMutedBrush}" />
+                    <views:PresencePreviewControl />
+                </StackPanel>
+            </Border>
+
+            <!-- Actions -->
+            <Border Classes="card">
+                <StackPanel Spacing="10">
+                    <Button Content="{Binding ConnectButtonLabel}"
+                            Command="{Binding ToggleConnectionCommand}"
+                            Classes="accent"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center" />
+                    <Button Content="Send update now"
+                            Command="{Binding SendNowCommand}"
+                            Classes="ghost"
+                            IsEnabled="{Binding IsConnected}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center" />
+                    <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                            CornerRadius="6" Padding="10,8">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="{Binding LastSentLabel}"
+                                       FontSize="11"
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                            <TextBlock Text="Another app showing instead? Discord may auto-detect other running apps. Disable its Discord integration, or go to Discord → Settings → Activity Privacy → Activity Settings and turn off that app."
+                                       FontSize="10"
+                                       TextWrapping="Wrap"
+                                       Classes="muted"
+                                       IsVisible="{Binding IsConnected}" />
+                            <TextBlock Text="Logs: %LocalAppData%\CustomRP.Modern\discord-rpc.log (Settings → Diagnostics → Open logs folder)."
+                                       FontSize="10"
+                                       TextWrapping="Wrap"
+                                       Classes="muted" />
+                        </StackPanel>
+                    </Border>
+                    <Grid ColumnDefinitions="*,8,*">
+                        <Button Grid.Column="0" Content="Save…"
+                                Classes="ghost" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding SaveAsCommand}"
+                                CommandParameter="{Binding $parent[Window]}" />
+                        <Button Grid.Column="2" Content="Open…"
+                                Classes="ghost" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding OpenCommand}"
+                                CommandParameter="{Binding $parent[Window]}" />
+                    </Grid>
+                    <Button Content="Save to Library"
+                            Classes="ghost"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding SaveToLibraryCommand}" />
+                    <Button Content="Reset"
+                            Classes="ghost"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding ResetCommand}" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+
+    </Grid>
+
+</UserControl>

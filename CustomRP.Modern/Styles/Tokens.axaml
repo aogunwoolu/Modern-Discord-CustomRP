@@ -1,0 +1,71 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.ThemeDictionaries>
+
+        <ResourceDictionary x:Key="Dark">
+            <Color x:Key="AppBackgroundColor">#0F1115</Color>
+            <Color x:Key="AppSurfaceColor">#171922</Color>
+            <Color x:Key="AppSurfaceElevatedColor">#1E2230</Color>
+            <Color x:Key="AppSurfaceHoverColor">#252A3A</Color>
+            <Color x:Key="AppBorderColor">#2A2F40</Color>
+            <Color x:Key="AppTextPrimaryColor">#F4F5FA</Color>
+            <Color x:Key="AppTextSecondaryColor">#A4A8BD</Color>
+            <Color x:Key="AppTextMutedColor">#6B7088</Color>
+            <Color x:Key="AppAccentColor">#5865F2</Color>
+            <Color x:Key="AppAccentHoverColor">#7983F5</Color>
+            <Color x:Key="AppAccentPressedColor">#4752C4</Color>
+            <Color x:Key="AppSuccessColor">#3BA55C</Color>
+            <Color x:Key="AppWarningColor">#FAA61A</Color>
+            <Color x:Key="AppDangerColor">#ED4245</Color>
+            <Color x:Key="AppDiscordCardColor">#2B2D31</Color>
+            <Color x:Key="AppDiscordCardHeaderColor">#1E1F22</Color>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <Color x:Key="AppBackgroundColor">#F4F5F8</Color>
+            <Color x:Key="AppSurfaceColor">#FFFFFF</Color>
+            <Color x:Key="AppSurfaceElevatedColor">#FFFFFF</Color>
+            <Color x:Key="AppSurfaceHoverColor">#EEF0F4</Color>
+            <Color x:Key="AppBorderColor">#DCDEE6</Color>
+            <Color x:Key="AppTextPrimaryColor">#0F1115</Color>
+            <Color x:Key="AppTextSecondaryColor">#4F5366</Color>
+            <Color x:Key="AppTextMutedColor">#8B90A6</Color>
+            <Color x:Key="AppAccentColor">#5865F2</Color>
+            <Color x:Key="AppAccentHoverColor">#4752C4</Color>
+            <Color x:Key="AppAccentPressedColor">#3C45A5</Color>
+            <Color x:Key="AppSuccessColor">#248045</Color>
+            <Color x:Key="AppWarningColor">#C77A00</Color>
+            <Color x:Key="AppDangerColor">#D83C40</Color>
+            <Color x:Key="AppDiscordCardColor">#FFFFFF</Color>
+            <Color x:Key="AppDiscordCardHeaderColor">#F2F3F5</Color>
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="{DynamicResource AppBackgroundColor}" />
+    <SolidColorBrush x:Key="AppSurfaceBrush" Color="{DynamicResource AppSurfaceColor}" />
+    <SolidColorBrush x:Key="AppSurfaceElevatedBrush" Color="{DynamicResource AppSurfaceElevatedColor}" />
+    <SolidColorBrush x:Key="AppSurfaceHoverBrush" Color="{DynamicResource AppSurfaceHoverColor}" />
+    <SolidColorBrush x:Key="AppBorderBrush" Color="{DynamicResource AppBorderColor}" />
+    <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="{DynamicResource AppTextPrimaryColor}" />
+    <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="{DynamicResource AppTextSecondaryColor}" />
+    <SolidColorBrush x:Key="AppTextMutedBrush" Color="{DynamicResource AppTextMutedColor}" />
+    <SolidColorBrush x:Key="AppAccentBrush" Color="{DynamicResource AppAccentColor}" />
+    <SolidColorBrush x:Key="AppAccentHoverBrush" Color="{DynamicResource AppAccentHoverColor}" />
+    <SolidColorBrush x:Key="AppAccentPressedBrush" Color="{DynamicResource AppAccentPressedColor}" />
+    <SolidColorBrush x:Key="AppSuccessBrush" Color="{DynamicResource AppSuccessColor}" />
+    <SolidColorBrush x:Key="AppWarningBrush" Color="{DynamicResource AppWarningColor}" />
+    <SolidColorBrush x:Key="AppDangerBrush" Color="{DynamicResource AppDangerColor}" />
+    <SolidColorBrush x:Key="AppDiscordCardBrush" Color="{DynamicResource AppDiscordCardColor}" />
+    <SolidColorBrush x:Key="AppDiscordCardHeaderBrush" Color="{DynamicResource AppDiscordCardHeaderColor}" />
+
+    <CornerRadius x:Key="AppCornerSmall">6</CornerRadius>
+    <CornerRadius x:Key="AppCornerMedium">10</CornerRadius>
+    <CornerRadius x:Key="AppCornerLarge">14</CornerRadius>
+
+    <Thickness x:Key="AppPaddingTight">8</Thickness>
+    <Thickness x:Key="AppPaddingDefault">16</Thickness>
+    <Thickness x:Key="AppPaddingComfortable">24</Thickness>
+
+</ResourceDictionary>

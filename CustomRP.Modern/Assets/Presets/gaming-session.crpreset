@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "name": "Gaming session",
+    "author": "CustomRP",
+    "description": "Generic playing template with party size. Replace Client ID and image keys for your game.",
+    "tags": ["starter", "games"]
+  },
+  "clientId": "",
+  "type": "Playing",
+  "display": "Name",
+  "activityName": "My Game",
+  "details": "In a match",
+  "state": "Ranked",
+  "partySize": 1,
+  "partyMax": 5,
+  "timestamps": "SinceStart",
+  "largeImage": { "key": "", "text": "" },
+  "smallImage": { "key": "", "text": "" },
+  "buttons": [{}, {}]
+}

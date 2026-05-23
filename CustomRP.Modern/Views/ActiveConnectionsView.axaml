@@ -1,0 +1,103 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CustomRP.Modern.ViewModels"
+             xmlns:svc="using:CustomRP.Modern.Services"
+             xmlns:cv="using:CustomRP.Modern.Converters"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700"
+             x:Class="CustomRP.Modern.Views.ActiveConnectionsView"
+             x:DataType="vm:ActiveConnectionsViewModel">
+
+    <UserControl.Resources>
+        <cv:StatusToColorConverter x:Key="StatusToColor" />
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,12" Spacing="4">
+            <TextBlock Text="Active Presences" Classes="h1" />
+            <TextBlock Text="Every running Discord rich presence. Multiple Client IDs can run side by side — Discord stacks them on your profile."
+                       Classes="muted" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="0,0,0,16" ColumnDefinitions="*,Auto">
+            <TextBlock Grid.Column="0"
+                       VerticalAlignment="Center"
+                       Classes="muted"
+                       FontSize="11"
+                       Text="{Binding Connections.Count, StringFormat='\{0\} active'}" />
+            <Button Grid.Column="1"
+                    Content="Stop all"
+                    Classes="ghost"
+                    Command="{Binding StopAllCommand}"
+                    IsEnabled="{Binding Connections.Count}" />
+        </Grid>
+
+        <Panel Grid.Row="2">
+
+            <TextBlock Text="{Binding EmptyHint}"
+                       Classes="muted"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Top"
+                       Margin="0,32,0,0"
+                       MaxWidth="420"
+                       IsVisible="{Binding !Connections.Count}" />
+
+            <ScrollViewer IsVisible="{Binding Connections.Count}">
+                <ItemsControl ItemsSource="{Binding Connections}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="svc:RpcConnection">
+                            <Border Classes="card" Margin="0,0,0,12">
+                                <Grid ColumnDefinitions="Auto,16,*,Auto" RowDefinitions="Auto,Auto,Auto">
+                                    <Ellipse Grid.Column="0" Grid.RowSpan="3"
+                                             Width="14" Height="14"
+                                             VerticalAlignment="Top"
+                                             Margin="0,6,0,0"
+                                             Fill="{Binding State, Converter={StaticResource StatusToColor}}" />
+
+                                    <TextBlock Grid.Column="2" Grid.Row="0"
+                                               Text="{Binding DisplayName}"
+                                               Classes="h3" />
+                                    <TextBlock Grid.Column="2" Grid.Row="1"
+                                               Text="{Binding ClientId, StringFormat='Client ID: \{0\}'}"
+                                               Classes="muted"
+                                               FontSize="11" />
+                                    <StackPanel Grid.Column="2" Grid.Row="2" Orientation="Horizontal" Spacing="10" Margin="0,4,0,0">
+                                        <TextBlock Text="{Binding State}" FontSize="11" />
+                                        <TextBlock Text="{Binding Username, FallbackValue=''}"
+                                                   FontSize="11"
+                                                   Classes="muted"
+                                                   IsVisible="{Binding Username, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                        <TextBlock Text="{Binding LastSentSummary, FallbackValue=''}"
+                                                   FontSize="11"
+                                                   Classes="muted"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   IsVisible="{Binding LastSentSummary, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="3" Grid.RowSpan="3"
+                                                Orientation="Horizontal" Spacing="6"
+                                                VerticalAlignment="Center">
+                                        <Button Content="Reconnect"
+                                                Classes="ghost"
+                                                Command="{Binding $parent[ItemsControl].((vm:ActiveConnectionsViewModel)DataContext).ReconnectCommand}"
+                                                CommandParameter="{Binding}" />
+                                        <Button Content="Stop"
+                                                Classes="danger"
+                                                Command="{Binding $parent[ItemsControl].((vm:ActiveConnectionsViewModel)DataContext).StopCommand}"
+                                                CommandParameter="{Binding}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+        </Panel>
+
+    </Grid>
+
+</UserControl>

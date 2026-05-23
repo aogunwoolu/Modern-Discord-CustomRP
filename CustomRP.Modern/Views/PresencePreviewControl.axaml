@@ -1,0 +1,122 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CustomRP.Modern.ViewModels"
+             xmlns:ctl="using:CustomRP.Modern.Controls"
+             xmlns:cv="using:CustomRP.Modern.Converters"
+             mc:Ignorable="d"
+             x:Class="CustomRP.Modern.Views.PresencePreviewControl"
+             x:DataType="vm:PresenceEditorViewModel">
+
+    <UserControl.Resources>
+        <cv:StringIsUrlConverter x:Key="IsUrl" />
+        <cv:StringIsNotUrlConverter x:Key="IsNotUrl" />
+    </UserControl.Resources>
+
+    <StackPanel Spacing="12">
+
+        <!-- Section heading -->
+        <TextBlock Text="{Binding ActivityType}"
+                   FontSize="11"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource AppTextSecondaryBrush}" />
+
+        <!-- Body -->
+        <Grid ColumnDefinitions="Auto,12,*">
+
+            <!-- Large image + small overlay -->
+            <Grid Grid.Column="0" Width="76" Height="76">
+                <Border CornerRadius="8" ClipToBounds="True"
+                        Background="{DynamicResource AppSurfaceHoverBrush}">
+                    <Panel>
+                        <Image ctl:UrlImage.Source="{Binding LargeImageKey}"
+                               Stretch="UniformToFill"
+                               IsVisible="{Binding LargeImageKey, Converter={StaticResource IsUrl}}" />
+                        <TextBlock Text="{Binding LargeImageKey}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   MaxLines="3"
+                                   Margin="4"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource AppTextMutedBrush}"
+                                   IsVisible="{Binding LargeImageKey, Converter={StaticResource IsNotUrl}}" />
+                    </Panel>
+                </Border>
+                <Border Width="28" Height="28" CornerRadius="14"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                        Margin="0,0,-6,-6"
+                        Background="{DynamicResource AppSurfaceHoverBrush}"
+                        BorderBrush="{DynamicResource AppDiscordCardBrush}"
+                        BorderThickness="3"
+                        ClipToBounds="True"
+                        IsVisible="{Binding EffectiveSmallImageKey, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <Panel>
+                        <Image ctl:UrlImage.Source="{Binding EffectiveSmallImageKey}"
+                               Stretch="UniformToFill"
+                               IsVisible="{Binding EffectiveSmallImageKey, Converter={StaticResource IsUrl}}" />
+                        <TextBlock Text="{Binding EffectiveSmallImageKey}"
+                                   FontSize="7"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   MaxLines="2"
+                                   Margin="2"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource AppTextMutedBrush}"
+                                   IsVisible="{Binding EffectiveSmallImageKey, Converter={StaticResource IsNotUrl}}" />
+                    </Panel>
+                </Border>
+            </Grid>
+
+            <!-- Text -->
+            <StackPanel Grid.Column="2" Spacing="2" VerticalAlignment="Center">
+                <TextBlock Text="{Binding ActivityName, FallbackValue='Activity name'}"
+                           FontWeight="SemiBold"
+                           FontSize="14"
+                           Foreground="{DynamicResource AppTextPrimaryBrush}"
+                           TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{Binding EffectiveDetails, FallbackValue='Details line'}"
+                           FontSize="12"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}"
+                           TextTrimming="CharacterEllipsis"
+                           IsVisible="{Binding EffectiveDetails, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                <TextBlock Text="{Binding EffectiveState, FallbackValue='State line'}"
+                           FontSize="12"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}"
+                           TextTrimming="CharacterEllipsis"
+                           IsVisible="{Binding EffectiveState, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                <TextBlock FontSize="12" Foreground="{DynamicResource AppTextMutedBrush}"
+                           Text="00:00 elapsed" />
+            </StackPanel>
+
+        </Grid>
+
+        <!-- Buttons -->
+        <StackPanel Spacing="6">
+            <Button Content="{Binding EffectiveButton1Text}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Background="{DynamicResource AppSurfaceHoverBrush}"
+                    Foreground="{DynamicResource AppTextPrimaryBrush}"
+                    BorderThickness="0"
+                    Padding="0,8"
+                    CornerRadius="6"
+                    IsVisible="{Binding EffectiveButton1Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <Button Content="{Binding EffectiveButton2Text}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Background="{DynamicResource AppSurfaceHoverBrush}"
+                    Foreground="{DynamicResource AppTextPrimaryBrush}"
+                    BorderThickness="0"
+                    Padding="0,8"
+                    CornerRadius="6"
+                    IsVisible="{Binding EffectiveButton2Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+
+    </StackPanel>
+
+</UserControl>

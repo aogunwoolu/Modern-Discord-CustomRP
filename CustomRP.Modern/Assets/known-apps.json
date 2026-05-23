@@ -1,0 +1,1065 @@
+[
+  /* =============== GAMES =============== */
+  {
+    "id": "minecraft-java",
+    "displayName": "Minecraft (Java Edition)",
+    "category": "Games",
+    "subcategory": "Sandbox",
+    "description": "The original Java edition of Minecraft. Use auto-update with window title to surface the world / server name as your status.",
+    "processNames": ["javaw", "minecraft"],
+    "tags": ["sandbox", "survival", "multiplayer"],
+    "defaultDetails": "Mining and crafting",
+    "defaultState": "In a world",
+    "defaultTimestamps": "SinceStart",
+    "defaultAutoUpdate": {
+      "enabled": false,
+      "strategy": "WindowTitle",
+      "processName": "javaw",
+      "intervalSeconds": 5,
+      "detailsTemplate": "{title}",
+      "stateTemplate": ""
+    },
+    "scenarios": [
+      { "name": "Survival", "description": "Vanilla survival mode", "details": "Surviving the night", "state": "Survival mode" },
+      { "name": "Creative", "description": "Building things", "details": "Building something incredible", "state": "Creative mode" },
+      { "name": "Multiplayer SMP", "description": "On an SMP server", "details": "Playing on an SMP", "state": "With friends" },
+      { "name": "Hardcore", "description": "One life only", "details": "Hardcore — one life left", "state": "Don't die" }
+    ],
+    "notes": "Most launchers run as 'javaw'. Confirm the process name in Auto-Detect before starting."
+  },
+  {
+    "id": "minecraft-bedrock",
+    "displayName": "Minecraft (Bedrock)",
+    "category": "Games",
+    "subcategory": "Sandbox",
+    "description": "Bedrock edition — Windows 10 / console / mobile version.",
+    "processNames": ["minecraft.windows"],
+    "tags": ["sandbox", "survival"],
+    "defaultDetails": "Playing Bedrock",
+    "defaultTimestamps": "SinceStart"
+  },
+  {
+    "id": "league",
+    "displayName": "League of Legends",
+    "category": "Games",
+    "subcategory": "MOBA",
+    "description": "Riot's flagship MOBA.",
+    "processNames": ["league of legends", "leagueclient"],
+    "tags": ["moba", "competitive", "riot"],
+    "defaultDetails": "In a match",
+    "defaultState": "Summoner's Rift",
+    "defaultTimestamps": "SinceStart",
+    "scenarios": [
+      { "name": "Ranked Solo/Duo", "description": "Climbing the ladder", "details": "Ranked Solo/Duo", "state": "Trying not to int" },
+      { "name": "Normal Draft", "description": "Casual draft", "details": "Normal Draft", "state": "For fun" },
+      { "name": "ARAM", "description": "Howling Abyss", "details": "ARAM", "state": "Howling Abyss" },
+      { "name": "TFT", "description": "Teamfight Tactics", "details": "Teamfight Tactics", "state": "Rolling for the comp" }
+    ]
+  },
+  {
+    "id": "valorant",
+    "displayName": "Valorant",
+    "category": "Games",
+    "subcategory": "FPS",
+    "description": "Riot's 5v5 tactical shooter.",
+    "processNames": ["valorant-win64-shipping"],
+    "tags": ["fps", "competitive", "riot"],
+    "defaultDetails": "In a match",
+    "defaultTimestamps": "SinceStart",
+    "scenarios": [
+      { "name": "Competitive", "description": "Ranked mode", "details": "Competitive", "state": "Climbing ranks" },
+      { "name": "Unrated", "description": "Casual unrated match", "details": "Unrated", "state": "Warming up" },
+      { "name": "Swiftplay", "description": "Quick match", "details": "Swiftplay", "state": "Short and sweet" },
+      { "name": "Deathmatch", "description": "Aim practice", "details": "Deathmatch", "state": "Aim training" }
+    ]
+  },
+  {
+    "id": "cs2",
+    "displayName": "Counter-Strike 2",
+    "category": "Games",
+    "subcategory": "FPS",
+    "description": "Valve's competitive shooter.",
+    "processNames": ["cs2"],
+    "tags": ["fps", "competitive", "valve"],
+    "defaultDetails": "In a match",
+    "defaultTimestamps": "SinceStart",
+    "scenarios": [
+      { "name": "Premier", "description": "Ranked CS rating", "details": "Premier", "state": "Climbing CS rating" },
+      { "name": "Competitive", "description": "Standard competitive", "details": "Competitive", "state": "" },
+      { "name": "Casual", "description": "Casual play", "details": "Casual", "state": "" },
+      { "name": "Deathmatch", "description": "Aim warm-up", "details": "Deathmatch", "state": "Warming up" }
+    ]
+  },
+  {
+    "id": "fortnite",
+    "displayName": "Fortnite",
+    "category": "Games",
+    "subcategory": "Battle Royale",
+    "description": "Epic's battle royale.",
+    "processNames": ["fortniteclient-win64-shipping"],
+    "tags": ["battle royale", "shooter", "epic"],
+    "defaultDetails": "Dropping in",
+    "defaultTimestamps": "SinceStart"
+  },
+  {
+    "id": "apex",
+    "displayName": "Apex Legends",
+    "category": "Games",
+    "subcategory": "Battle Royale",
+    "processNames": ["r5apex"],
+    "tags": ["battle royale", "fps"],
+    "defaultDetails": "In a match",
+    "defaultTimestamps": "SinceStart"
+  },
+  {
+    "id": "overwatch",
+    "displayName": "Overwatch 2",
+    "category": "Games",
+    "subcategory": "Hero Shooter",
+    "processNames": ["overwatch"],
+    "tags": ["hero shooter", "blizzard"],
+    "defaultDetails": "In a match",
+    "defaultTimestamps": "SinceStart"
+  },
+  {
+    "id": "rocket-league",
+    "displayName": "Rocket League",
+    "category": "Games",
+    "subcategory": "Sports",
+    "processNames": ["rocketleague"],
+    "tags": ["sports", "cars"],
+    "defaultDetails": "Playing Rocket League",
+    "defaultTimestamps": "SinceStart"
+  },
+  {
+    "id": "fall-guys",
+    "displayName": "Fall Guys",
+    "category": "Games",
+    "subcategory": "Party",
+    "processNames": ["fallguys_client"],
+    "tags": ["party", "battle royale"]
+  },
+  {
+    "id": "roblox",
+    "displayName": "Roblox",
+    "category": "Games",
+    "subcategory": "Sandbox",
+    "processNames": ["robloxplayerbeta"],
+    "tags": ["sandbox", "user-generated"],
+    "defaultDetails": "Playing Roblox",
+    "defaultTimestamps": "SinceStart",
+    "defaultAutoUpdate": {
+      "enabled": false,
+      "strategy": "WindowTitle",
+      "processName": "robloxplayerbeta",
+      "intervalSeconds": 5,
+      "detailsTemplate": "{title}"
+    }
+  },
+  {
+    "id": "genshin",
+    "displayName": "Genshin Impact",
+    "category": "Games",
+    "subcategory": "RPG",
+    "processNames": ["genshinimpact"],
+    "tags": ["rpg", "anime", "hoyoverse", "gacha"],
+    "defaultDetails": "Exploring Teyvat",
+    "defaultTimestamps": "SinceStart"
+  },
+  {
+    "id": "hsr",
+    "displayName": "Honkai: Star Rail",
+    "category": "Games",
+    "subcategory": "RPG",
+    "processNames": ["starrail"],
+    "tags": ["rpg", "turn-based", "hoyoverse", "gacha"]
+  },
+  {
+    "id": "wuwa",
+    "displayName": "Wuthering Waves",
+    "category": "Games",
+    "subcategory": "RPG",
+    "processNames": ["client-win64-shipping", "wuthering waves"],
+    "tags": ["rpg", "action", "gacha"]
+  },
+  {
+    "id": "zzz",
+    "displayName": "Zenless Zone Zero",
+    "category": "Games",
+    "subcategory": "RPG",
+    "processNames": ["zenlesszonezero"],
+    "tags": ["rpg", "action", "hoyoverse", "gacha"]
+  },
+  {
+    "id": "stardew",
+    "displayName": "Stardew Valley",
+    "category": "Games",
+    "subcategory": "Farming Sim",
+    "processNames": ["stardew valley", "stardewmodapi"],
+    "tags": ["farming", "indie", "relaxing"],
+    "defaultDetails": "Tending the farm",
+    "defaultTimestamps": "SinceStart",
+    "scenarios": [
+      { "name": "Farming", "description": "Working the fields", "details": "Watering crops", "state": "Spring, Year 1" },
+      { "name": "Mining", "description": "In the mines", "details": "Mining in the caves", "state": "Looking for iridium" },
+      { "name": "Fishing", "description": "By the water", "details": "Fishing", "state": "Patient and zen" }
+    ]
+  },
+  {
+    "id": "terraria",
+    "displayName": "Terraria",
+    "category": "Games",
+    "subcategory": "Sandbox",
+    "processNames": ["terraria"],
+    "tags": ["sandbox", "2d", "survival"]
+  },
+  {
+    "id": "elden-ring",
+    "displayName": "Elden Ring",
+    "category": "Games",
+    "subcategory": "Souls-like",
+    "processNames": ["eldenring"],
+    "tags": ["souls-like", "rpg", "fromsoftware"],
+    "defaultDetails": "Adventuring in the Lands Between",
+    "defaultTimestamps": "SinceStart",
+    "scenarios": [
+      { "name": "Exploring", "description": "Roaming", "details": "Exploring the Lands Between", "state": "Tarnished, rise" },
+      { "name": "Boss fight", "description": "In combat", "details": "Fighting a boss", "state": "YOU DIED" },
+      { "name": "Co-op", "description": "Helping others", "details": "Summoned for co-op", "state": "Honour the lord" }
+    ]
+  },
+  {
+    "id": "hollow-knight",
+    "displayName": "Hollow Knight",
+    "category": "Games",
+    "subcategory": "Metroidvania",
+    "processNames": ["hollow_knight"],
+    "tags": ["metroidvania", "indie", "platformer"]
+  },
+  {
+    "id": "hades",
+    "displayName": "Hades II",
+    "category": "Games",
+    "subcategory": "Rogue-like",
+    "processNames": ["hades2"],
+    "tags": ["roguelike", "indie", "supergiant"]
+  },
+  {
+    "id": "celeste",
+    "displayName": "Celeste",
+    "category": "Games",
+    "subcategory": "Platformer",
+    "processNames": ["celeste"],
+    "tags": ["platformer", "indie"]
+  },
+  {
+    "id": "gtav",
+    "displayName": "Grand Theft Auto V",
+    "category": "Games",
+    "subcategory": "Open World",
+    "processNames": ["gta5"],
+    "tags": ["open world", "rockstar"]
+  },
+  {
+    "id": "rdr2",
+    "displayName": "Red Dead Redemption 2",
+    "category": "Games",
+    "subcategory": "Open World",
+    "processNames": ["rdr2"],
+    "tags": ["open world", "western", "rockstar"]
+  },
+  {
+    "id": "cyberpunk",
+    "displayName": "Cyberpunk 2077",
+    "category": "Games",
+    "subcategory": "Open World",
+    "processNames": ["cyberpunk2077"],
+    "tags": ["open world", "rpg", "cd projekt red"]
+  },
+  {
+    "id": "witcher3",
+    "displayName": "The Witcher 3",
+    "category": "Games",
+    "subcategory": "RPG",
+    "processNames": ["witcher3"],
+    "tags": ["rpg", "open world", "cd projekt red"]
+  },
+  {
+    "id": "osrs",
+    "displayName": "Old School RuneScape",
+    "category": "Games",
+    "subcategory": "MMORPG",
+    "processNames": ["jagexlauncher", "java", "osrs"],
+    "tags": ["mmorpg", "old school"]
+  },
+  {
+    "id": "wow",
+    "displayName": "World of Warcraft",
+    "category": "Games",
+    "subcategory": "MMORPG",
+    "processNames": ["wow"],
+    "tags": ["mmorpg", "blizzard"]
+  },
+  {
+    "id": "ffxiv",
+    "displayName": "Final Fantasy XIV",
+    "category": "Games",
+    "subcategory": "MMORPG",
+    "processNames": ["ffxiv_dx11", "ffxiv"],
+    "tags": ["mmorpg", "square enix"]
+  },
+  {
+    "id": "valheim",
+    "displayName": "Valheim",
+    "category": "Games",
+    "subcategory": "Survival",
+    "processNames": ["valheim"],
+    "tags": ["survival", "viking", "co-op"]
+  },
+  {
+    "id": "palworld",
+    "displayName": "Palworld",
+    "category": "Games",
+    "subcategory": "Survival",
+    "processNames": ["palworld-win64-shipping"],
+    "tags": ["survival", "creature collector"]
+  },
+  {
+    "id": "rust",
+    "displayName": "Rust",
+    "category": "Games",
+    "subcategory": "Survival",
+    "processNames": ["rustclient"],
+    "tags": ["survival", "pvp"]
+  },
+  {
+    "id": "ark",
+    "displayName": "ARK: Survival Ascended",
+    "category": "Games",
+    "subcategory": "Survival",
+    "processNames": ["arkascended"],
+    "tags": ["survival", "dinosaurs"]
+  },
+  {
+    "id": "pz",
+    "displayName": "Project Zomboid",
+    "category": "Games",
+    "subcategory": "Survival",
+    "processNames": ["projectzomboid64", "javaw"],
+    "tags": ["survival", "zombies", "isometric"]
+  },
+  {
+    "id": "phasmo",
+    "displayName": "Phasmophobia",
+    "category": "Games",
+    "subcategory": "Horror",
+    "processNames": ["phasmophobia"],
+    "tags": ["horror", "co-op"]
+  },
+  {
+    "id": "lethal-company",
+    "displayName": "Lethal Company",
+    "category": "Games",
+    "subcategory": "Horror",
+    "processNames": ["lethal company"],
+    "tags": ["horror", "co-op", "indie"]
+  },
+  {
+    "id": "repo",
+    "displayName": "R.E.P.O.",
+    "category": "Games",
+    "subcategory": "Horror",
+    "processNames": ["repo"],
+    "tags": ["horror", "co-op", "indie"]
+  },
+  {
+    "id": "dbd",
+    "displayName": "Dead by Daylight",
+    "category": "Games",
+    "subcategory": "Horror",
+    "processNames": ["deadbydaylight-win64-shipping"],
+    "tags": ["horror", "asymmetric"]
+  },
+  {
+    "id": "rainbow6",
+    "displayName": "Rainbow Six Siege",
+    "category": "Games",
+    "subcategory": "FPS",
+    "processNames": ["rainbowsix"],
+    "tags": ["fps", "tactical"]
+  },
+  {
+    "id": "pubg",
+    "displayName": "PUBG: Battlegrounds",
+    "category": "Games",
+    "subcategory": "Battle Royale",
+    "processNames": ["tslgame"],
+    "tags": ["battle royale", "fps"]
+  },
+
+  /* =============== MUSIC =============== */
+  {
+    "id": "spotify",
+    "displayName": "Spotify",
+    "category": "Music",
+    "description": "Spotify ships native Rich Presence in its desktop client — enable it in Spotify settings before using a manual override here.",
+    "processNames": ["spotify"],
+    "tags": ["music", "streaming"],
+    "defaultActivityType": "Listening",
+    "defaultDetails": "Listening to music",
+    "defaultAutoUpdate": {
+      "enabled": false,
+      "strategy": "WindowTitle",
+      "processName": "spotify",
+      "intervalSeconds": 5,
+      "detailsTemplate": "{title}"
+    },
+    "notes": "When playing, Spotify's window title is 'Artist - Track'. The {title} template picks that up."
+  },
+  {
+    "id": "ytmusic",
+    "displayName": "YouTube Music Desktop",
+    "category": "Music",
+    "processNames": ["youtube music desktop app", "youtube music"],
+    "tags": ["music", "streaming"],
+    "defaultActivityType": "Listening"
+  },
+  {
+    "id": "apple-music",
+    "displayName": "Apple Music",
+    "category": "Music",
+    "processNames": ["applemusic"],
+    "tags": ["music", "streaming"],
+    "defaultActivityType": "Listening"
+  },
+  {
+    "id": "tidal",
+    "displayName": "Tidal",
+    "category": "Music",
+    "processNames": ["tidal"],
+    "tags": ["music", "streaming", "hi-fi"],
+    "defaultActivityType": "Listening"
+  },
+  {
+    "id": "soundcloud",
+    "displayName": "SoundCloud",
+    "category": "Music",
+    "processNames": ["chrome", "msedge", "firefox"],
+    "tags": ["music", "streaming", "web"],
+    "defaultActivityType": "Listening",
+    "notes": "SoundCloud runs in a browser tab — use the browser auto-update strategy."
+  },
+  {
+    "id": "deezer",
+    "displayName": "Deezer",
+    "category": "Music",
+    "processNames": ["deezer"],
+    "tags": ["music", "streaming"],
+    "defaultActivityType": "Listening"
+  },
+  {
+    "id": "foobar",
+    "displayName": "foobar2000",
+    "category": "Music",
+    "processNames": ["foobar2000"],
+    "tags": ["music", "local"],
+    "defaultActivityType": "Listening"
+  },
+
+  /* =============== VIDEO / STREAMING =============== */
+  {
+    "id": "netflix",
+    "displayName": "Netflix",
+    "category": "Video",
+    "processNames": ["chrome", "msedge"],
+    "tags": ["video", "streaming"],
+    "defaultActivityType": "Watching"
+  },
+  {
+    "id": "youtube",
+    "displayName": "YouTube",
+    "category": "Video",
+    "processNames": ["chrome", "msedge", "firefox"],
+    "tags": ["video", "streaming"],
+    "defaultActivityType": "Watching",
+    "defaultAutoUpdate": {
+      "enabled": false,
+      "strategy": "BrowserUrl",
+      "processName": "chrome",
+      "intervalSeconds": 5,
+      "detailsTemplate": "{title}",
+      "stateTemplate": "youtube.com",
+      "useFaviconAsSmallImage": true
+    }
+  },
+  {
+    "id": "twitch",
+    "displayName": "Twitch",
+    "category": "Video",
+    "processNames": ["chrome", "msedge"],
+    "tags": ["streaming", "live"],
+    "defaultActivityType": "Watching"
+  },
+  {
+    "id": "crunchyroll",
+    "displayName": "Crunchyroll",
+    "category": "Video",
+    "processNames": ["chrome", "msedge"],
+    "tags": ["anime", "streaming"],
+    "defaultActivityType": "Watching"
+  },
+  {
+    "id": "plex",
+    "displayName": "Plex",
+    "category": "Video",
+    "processNames": ["plex"],
+    "tags": ["video", "self-hosted"],
+    "defaultActivityType": "Watching"
+  },
+  {
+    "id": "jellyfin",
+    "displayName": "Jellyfin",
+    "category": "Video",
+    "processNames": ["jellyfin"],
+    "tags": ["video", "self-hosted", "open source"],
+    "defaultActivityType": "Watching"
+  },
+
+  /* =============== DEVELOPMENT =============== */
+  {
+    "id": "vscode",
+    "displayName": "Visual Studio Code",
+    "category": "Development",
+    "subcategory": "Editor",
+    "description": "Microsoft's lightweight editor. Install 'Discord Rich Presence' or 'vscord' extension for native project-aware presence.",
+    "processNames": ["code", "code-insiders"],
+    "tags": ["editor", "microsoft"],
+    "defaultDetails": "Editing code",
+    "defaultState": "in Visual Studio Code",
+    "defaultTimestamps": "SinceStart",
+    "defaultAutoUpdate": {
+      "enabled": false,
+      "strategy": "WindowTitle",
+      "processName": "code",
+      "intervalSeconds": 5,
+      "detailsTemplate": "{title}"
+    },
+    "scenarios": [
+      { "name": "Coding", "description": "Active development", "details": "Editing {file}", "state": "In Visual Studio Code" },
+      { "name": "Debugging", "description": "In the debugger", "details": "Debugging", "state": "Setting breakpoints" },
+      { "name": "In a PR", "description": "Code review", "details": "Reviewing a pull request", "state": "Reading diffs" }
+    ]
+  },
+  {
+    "id": "vscode-insiders",
+    "displayName": "VS Code Insiders",
+    "category": "Development",
+    "subcategory": "Editor",
+    "processNames": ["code-insiders"],
+    "tags": ["editor", "microsoft", "beta"]
+  },
+  {
+    "id": "cursor",
+    "displayName": "Cursor",
+    "category": "Development",
+    "subcategory": "Editor",
+    "description": "AI-powered VS Code fork from Anysphere.",
+    "processNames": ["cursor"],
+    "tags": ["editor", "ai"],
+    "defaultDetails": "Pair programming with AI",
+    "defaultState": "in Cursor"
+  },
+  {
+    "id": "windsurf",
+    "displayName": "Windsurf",
+    "category": "Development",
+    "subcategory": "Editor",
+    "processNames": ["windsurf"],
+    "tags": ["editor", "ai"]
+  },
+  {
+    "id": "zed",
+    "displayName": "Zed",
+    "category": "Development",
+    "subcategory": "Editor",
+    "processNames": ["zed"],
+    "tags": ["editor", "rust"]
+  },
+  {
+    "id": "neovim",
+    "displayName": "Neovim",
+    "category": "Development",
+    "subcategory": "Editor",
+    "processNames": ["nvim"],
+    "tags": ["editor", "terminal", "vim"]
+  },
+  {
+    "id": "visualstudio",
+    "displayName": "Visual Studio",
+    "category": "Development",
+    "subcategory": "IDE",
+    "processNames": ["devenv"],
+    "tags": ["ide", "microsoft", "dotnet"],
+    "defaultDetails": "Working on a solution",
+    "defaultState": "in Visual Studio"
+  },
+  {
+    "id": "rider",
+    "displayName": "JetBrains Rider",
+    "category": "Development",
+    "subcategory": "IDE",
+    "processNames": ["rider64"],
+    "tags": ["ide", "jetbrains", "dotnet"]
+  },
+  {
+    "id": "intellij",
+    "displayName": "IntelliJ IDEA",
+    "category": "Development",
+    "subcategory": "IDE",
+    "processNames": ["idea64", "idea"],
+    "tags": ["ide", "jetbrains", "java"]
+  },
+  {
+    "id": "pycharm",
+    "displayName": "PyCharm",
+    "category": "Development",
+    "subcategory": "IDE",
+    "processNames": ["pycharm64"],
+    "tags": ["ide", "jetbrains", "python"]
+  },
+  {
+    "id": "webstorm",
+    "displayName": "WebStorm",
+    "category": "Development",
+    "subcategory": "IDE",
+    "processNames": ["webstorm64"],
+    "tags": ["ide", "jetbrains", "javascript"]
+  },
+  {
+    "id": "clion",
+    "displayName": "CLion",
+    "category": "Development",
+    "subcategory": "IDE",
+    "processNames": ["clion64"],
+    "tags": ["ide", "jetbrains", "c++"]
+  },
+  {
+    "id": "goland",
+    "displayName": "GoLand",
+    "category": "Development",
+    "subcategory": "IDE",
+    "processNames": ["goland64"],
+    "tags": ["ide", "jetbrains", "go"]
+  },
+  {
+    "id": "phpstorm",
+    "displayName": "PhpStorm",
+    "category": "Development",
+    "subcategory": "IDE",
+    "processNames": ["phpstorm64"],
+    "tags": ["ide", "jetbrains", "php"]
+  },
+  {
+    "id": "android-studio",
+    "displayName": "Android Studio",
+    "category": "Development",
+    "subcategory": "IDE",
+    "processNames": ["studio64"],
+    "tags": ["ide", "android", "google"]
+  },
+  {
+    "id": "github-desktop",
+    "displayName": "GitHub Desktop",
+    "category": "Development",
+    "subcategory": "Tools",
+    "processNames": ["github desktop", "githubdesktop"],
+    "tags": ["git", "github"]
+  },
+  {
+    "id": "postman",
+    "displayName": "Postman",
+    "category": "Development",
+    "subcategory": "Tools",
+    "processNames": ["postman"],
+    "tags": ["api", "http"]
+  },
+  {
+    "id": "docker-desktop",
+    "displayName": "Docker Desktop",
+    "category": "Development",
+    "subcategory": "Tools",
+    "processNames": ["docker desktop"],
+    "tags": ["containers", "devops"]
+  },
+  {
+    "id": "terminal",
+    "displayName": "Windows Terminal",
+    "category": "Development",
+    "subcategory": "Tools",
+    "processNames": ["windowsterminal"],
+    "tags": ["terminal", "shell"]
+  },
+
+  /* =============== CREATIVE =============== */
+  {
+    "id": "photoshop",
+    "displayName": "Adobe Photoshop",
+    "category": "Creative",
+    "subcategory": "Image",
+    "processNames": ["photoshop"],
+    "tags": ["adobe", "design", "raster"],
+    "defaultDetails": "Editing a photo"
+  },
+  {
+    "id": "illustrator",
+    "displayName": "Adobe Illustrator",
+    "category": "Creative",
+    "subcategory": "Image",
+    "processNames": ["illustrator"],
+    "tags": ["adobe", "design", "vector"]
+  },
+  {
+    "id": "premiere",
+    "displayName": "Adobe Premiere Pro",
+    "category": "Creative",
+    "subcategory": "Video",
+    "processNames": ["adobe premiere pro"],
+    "tags": ["adobe", "video", "editing"],
+    "defaultDetails": "Editing video"
+  },
+  {
+    "id": "ae",
+    "displayName": "Adobe After Effects",
+    "category": "Creative",
+    "subcategory": "Video",
+    "processNames": ["afterfx"],
+    "tags": ["adobe", "motion", "compositing"]
+  },
+  {
+    "id": "lightroom",
+    "displayName": "Adobe Lightroom",
+    "category": "Creative",
+    "subcategory": "Image",
+    "processNames": ["lightroom"],
+    "tags": ["adobe", "photo"]
+  },
+  {
+    "id": "figma",
+    "displayName": "Figma",
+    "category": "Creative",
+    "subcategory": "UI/UX",
+    "processNames": ["figma"],
+    "tags": ["design", "ui", "collaborative"],
+    "defaultDetails": "Designing in Figma"
+  },
+  {
+    "id": "blender",
+    "displayName": "Blender",
+    "category": "Creative",
+    "subcategory": "3D",
+    "processNames": ["blender"],
+    "tags": ["3d", "open source", "modeling"],
+    "defaultDetails": "Modeling in Blender",
+    "scenarios": [
+      { "name": "Modeling", "description": "Pure modeling", "details": "Modeling", "state": "Pushing vertices" },
+      { "name": "Sculpting", "description": "Digital sculpting", "details": "Sculpting", "state": "Brushing geometry" },
+      { "name": "Rendering", "description": "Final render", "details": "Rendering a frame", "state": "Cycles is grinding" },
+      { "name": "Animating", "description": "Keyframes", "details": "Animating", "state": "Posing characters" }
+    ]
+  },
+  {
+    "id": "maya",
+    "displayName": "Autodesk Maya",
+    "category": "Creative",
+    "subcategory": "3D",
+    "processNames": ["maya"],
+    "tags": ["3d", "modeling", "animation"]
+  },
+  {
+    "id": "davinci",
+    "displayName": "DaVinci Resolve",
+    "category": "Creative",
+    "subcategory": "Video",
+    "processNames": ["resolve"],
+    "tags": ["video", "color", "blackmagic"]
+  },
+  {
+    "id": "ableton",
+    "displayName": "Ableton Live",
+    "category": "Creative",
+    "subcategory": "Audio",
+    "processNames": ["ableton live"],
+    "tags": ["daw", "music", "production"]
+  },
+  {
+    "id": "fl-studio",
+    "displayName": "FL Studio",
+    "category": "Creative",
+    "subcategory": "Audio",
+    "processNames": ["fl64", "fl"],
+    "tags": ["daw", "music", "production"]
+  },
+  {
+    "id": "reaper",
+    "displayName": "REAPER",
+    "category": "Creative",
+    "subcategory": "Audio",
+    "processNames": ["reaper"],
+    "tags": ["daw", "music"]
+  },
+  {
+    "id": "obs",
+    "displayName": "OBS Studio",
+    "category": "Creative",
+    "subcategory": "Streaming",
+    "processNames": ["obs64", "obs32"],
+    "tags": ["streaming", "recording", "open source"],
+    "defaultDetails": "Streaming"
+  },
+  {
+    "id": "streamlabs",
+    "displayName": "Streamlabs Desktop",
+    "category": "Creative",
+    "subcategory": "Streaming",
+    "processNames": ["streamlabs obs"],
+    "tags": ["streaming"]
+  },
+
+  /* =============== PRODUCTIVITY =============== */
+  {
+    "id": "notion",
+    "displayName": "Notion",
+    "category": "Productivity",
+    "subcategory": "Notes",
+    "processNames": ["notion"],
+    "tags": ["notes", "wiki"]
+  },
+  {
+    "id": "obsidian",
+    "displayName": "Obsidian",
+    "category": "Productivity",
+    "subcategory": "Notes",
+    "processNames": ["obsidian"],
+    "tags": ["notes", "markdown", "wiki"],
+    "defaultDetails": "Tending the digital garden"
+  },
+  {
+    "id": "logseq",
+    "displayName": "Logseq",
+    "category": "Productivity",
+    "subcategory": "Notes",
+    "processNames": ["logseq"],
+    "tags": ["notes", "markdown", "open source"]
+  },
+  {
+    "id": "word",
+    "displayName": "Microsoft Word",
+    "category": "Productivity",
+    "subcategory": "Office",
+    "processNames": ["winword"],
+    "tags": ["office", "microsoft", "writing"]
+  },
+  {
+    "id": "excel",
+    "displayName": "Microsoft Excel",
+    "category": "Productivity",
+    "subcategory": "Office",
+    "processNames": ["excel"],
+    "tags": ["office", "microsoft", "spreadsheet"]
+  },
+  {
+    "id": "powerpoint",
+    "displayName": "Microsoft PowerPoint",
+    "category": "Productivity",
+    "subcategory": "Office",
+    "processNames": ["powerpnt"],
+    "tags": ["office", "microsoft", "presentation"]
+  },
+  {
+    "id": "onenote",
+    "displayName": "Microsoft OneNote",
+    "category": "Productivity",
+    "subcategory": "Notes",
+    "processNames": ["onenote"],
+    "tags": ["office", "microsoft", "notes"]
+  },
+  {
+    "id": "outlook",
+    "displayName": "Microsoft Outlook",
+    "category": "Productivity",
+    "subcategory": "Email",
+    "processNames": ["outlook"],
+    "tags": ["office", "email"]
+  },
+
+  /* =============== BROWSERS =============== */
+  {
+    "id": "chrome",
+    "displayName": "Google Chrome",
+    "category": "Browsers",
+    "processNames": ["chrome"],
+    "tags": ["browser", "google"],
+    "description": "Pair with the Browser URL auto-update strategy to surface the current page as your status.",
+    "defaultAutoUpdate": {
+      "enabled": false,
+      "strategy": "BrowserUrl",
+      "processName": "chrome",
+      "intervalSeconds": 5,
+      "detailsTemplate": "{title}",
+      "stateTemplate": "{host}",
+      "useFaviconAsSmallImage": true
+    }
+  },
+  {
+    "id": "edge",
+    "displayName": "Microsoft Edge",
+    "category": "Browsers",
+    "processNames": ["msedge"],
+    "tags": ["browser", "microsoft"],
+    "defaultAutoUpdate": {
+      "enabled": false,
+      "strategy": "BrowserUrl",
+      "processName": "msedge",
+      "intervalSeconds": 5,
+      "detailsTemplate": "{title}",
+      "stateTemplate": "{host}",
+      "useFaviconAsSmallImage": true
+    }
+  },
+  {
+    "id": "firefox",
+    "displayName": "Mozilla Firefox",
+    "category": "Browsers",
+    "processNames": ["firefox"],
+    "tags": ["browser", "mozilla"],
+    "defaultAutoUpdate": {
+      "enabled": false,
+      "strategy": "BrowserUrl",
+      "processName": "firefox",
+      "intervalSeconds": 5,
+      "detailsTemplate": "{title}",
+      "stateTemplate": "{host}",
+      "useFaviconAsSmallImage": true
+    }
+  },
+  {
+    "id": "brave",
+    "displayName": "Brave",
+    "category": "Browsers",
+    "processNames": ["brave"],
+    "tags": ["browser", "privacy"],
+    "defaultAutoUpdate": {
+      "enabled": false,
+      "strategy": "BrowserUrl",
+      "processName": "brave",
+      "intervalSeconds": 5,
+      "detailsTemplate": "{title}",
+      "stateTemplate": "{host}",
+      "useFaviconAsSmallImage": true
+    }
+  },
+  {
+    "id": "opera",
+    "displayName": "Opera",
+    "category": "Browsers",
+    "processNames": ["opera"],
+    "tags": ["browser"]
+  },
+  {
+    "id": "arc",
+    "displayName": "Arc",
+    "category": "Browsers",
+    "processNames": ["arc"],
+    "tags": ["browser"]
+  },
+  {
+    "id": "vivaldi",
+    "displayName": "Vivaldi",
+    "category": "Browsers",
+    "processNames": ["vivaldi"],
+    "tags": ["browser"]
+  },
+
+  /* =============== COMMUNICATION =============== */
+  {
+    "id": "discord",
+    "displayName": "Discord",
+    "category": "Communication",
+    "processNames": ["discord"],
+    "tags": ["chat", "voice"],
+    "notes": "Yes — you can present Discord as your activity. Self-aware."
+  },
+  {
+    "id": "slack",
+    "displayName": "Slack",
+    "category": "Communication",
+    "processNames": ["slack"],
+    "tags": ["chat", "work"]
+  },
+  {
+    "id": "teams",
+    "displayName": "Microsoft Teams",
+    "category": "Communication",
+    "processNames": ["teams", "ms-teams"],
+    "tags": ["chat", "video", "microsoft"]
+  },
+  {
+    "id": "zoom",
+    "displayName": "Zoom",
+    "category": "Communication",
+    "processNames": ["zoom"],
+    "tags": ["video", "meetings"]
+  },
+  {
+    "id": "telegram",
+    "displayName": "Telegram",
+    "category": "Communication",
+    "processNames": ["telegram"],
+    "tags": ["chat", "messaging"]
+  },
+
+  /* =============== GAME LAUNCHERS =============== */
+  {
+    "id": "steam",
+    "displayName": "Steam",
+    "category": "Launchers",
+    "processNames": ["steam"],
+    "tags": ["valve", "store"],
+    "notes": "Use when no specific Steam game has its own Discord integration."
+  },
+  {
+    "id": "epic",
+    "displayName": "Epic Games Launcher",
+    "category": "Launchers",
+    "processNames": ["epicgameslauncher"],
+    "tags": ["epic", "store"]
+  },
+  {
+    "id": "battlenet",
+    "displayName": "Battle.net",
+    "category": "Launchers",
+    "processNames": ["battle.net"],
+    "tags": ["blizzard", "store"]
+  },
+  {
+    "id": "ea-desktop",
+    "displayName": "EA Desktop",
+    "category": "Launchers",
+    "processNames": ["eadesktop"],
+    "tags": ["ea", "store"]
+  },
+  {
+    "id": "gog",
+    "displayName": "GOG Galaxy",
+    "category": "Launchers",
+    "processNames": ["galaxyclient"],
+    "tags": ["gog", "store"]
+  },
+  {
+    "id": "ubisoft-connect",
+    "displayName": "Ubisoft Connect",
+    "category": "Launchers",
+    "processNames": ["upc"],
+    "tags": ["ubisoft", "store"]
+  }
+]

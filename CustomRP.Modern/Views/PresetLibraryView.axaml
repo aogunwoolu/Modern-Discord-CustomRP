@@ -1,0 +1,421 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CustomRP.Modern.ViewModels"
+             xmlns:m="using:CustomRP.Modern.Models"
+             xmlns:svc="using:CustomRP.Modern.Services"
+             xmlns:ctrl="using:CustomRP.Modern.Controls"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="CustomRP.Modern.Views.PresetLibraryView"
+             x:DataType="vm:PresetLibraryViewModel">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,12" Spacing="4">
+            <TextBlock Text="Preset Library" Classes="h1" />
+            <TextBlock Text="Your saved presets and a curated catalogue of well-known apps. Click any app to see scenarios and start a preset."
+                       Classes="muted" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <!-- Toolbar -->
+        <Grid Grid.Row="1" Margin="0,0,0,16" ColumnDefinitions="*,Auto,Auto">
+            <TextBox Grid.Column="0"
+                     Text="{Binding Search}"
+                     Watermark="Search apps, tags, descriptions…" />
+            <Button Grid.Column="1" Content="Refresh"
+                    Classes="ghost" Margin="8,0,0,0"
+                    Command="{Binding RefreshCommand}" />
+            <Button Grid.Column="2" Content="Import…"
+                    Classes="ghost" Margin="8,0,0,0"
+                    Command="{Binding ImportCommand}"
+                    CommandParameter="{Binding $parent[Window]}" />
+        </Grid>
+
+        <!-- Tab content -->
+        <TabControl Grid.Row="2">
+
+            <!-- KNOWN APPS TAB -->
+            <TabItem Header="Known Apps">
+                <Grid ColumnDefinitions="180,12,*,12,340" Margin="0,8,0,0">
+
+                    <!-- Categories -->
+                    <Border Grid.Column="0" Classes="card" Padding="6">
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding Categories}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Button Content="{Binding}"
+                                                Classes="ghost"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Left"
+                                                Margin="0,0,0,4"
+                                                Padding="10,7"
+                                                BorderThickness="0"
+                                                Command="{Binding $parent[ItemsControl].((vm:PresetLibraryViewModel)DataContext).SelectCategoryCommand}"
+                                                CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+
+                    <!-- App list -->
+                    <Border Grid.Column="2" Classes="card" Padding="0">
+                        <Panel>
+                        <TextBlock Text="Could not load the app catalogue. Rebuild the app or check Assets/known-apps.json."
+                                   Classes="muted"
+                                   TextWrapping="Wrap"
+                                   Margin="16"
+                                   IsVisible="{Binding !KnownAppCount}" />
+                        <ListBox ItemsSource="{Binding KnownApps}"
+                                 IsVisible="{Binding KnownAppCount}"
+                                 SelectedItem="{Binding SelectedKnownApp}"
+                                 Background="Transparent"
+                                 BorderThickness="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="m:KnownApp">
+                                    <Grid ColumnDefinitions="30,6,*,Auto" Margin="4,2">
+                                        <!-- App icon -->
+                                        <Border Grid.Column="0" Width="28" Height="28"
+                                                CornerRadius="6" ClipToBounds="True"
+                                                Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                VerticalAlignment="Center">
+                                            <Image ctrl:UrlImage.Source="{Binding IconUrl}"
+                                                   Width="28" Height="28"
+                                                   Stretch="Uniform"
+                                                   IsVisible="{Binding IconUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                        </Border>
+                                        <!-- Name + category -->
+                                        <StackPanel Grid.Column="2" Spacing="2" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       FontWeight="SemiBold"
+                                                       FontSize="13"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="{Binding Category}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource AppTextMutedBrush}" />
+                                                <TextBlock Text="·"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource AppTextMutedBrush}"
+                                                           IsVisible="{Binding Subcategory, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                                <TextBlock Text="{Binding Subcategory}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource AppTextMutedBrush}"
+                                                           IsVisible="{Binding Subcategory, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <!-- Variants badge -->
+                                        <Border Grid.Column="3"
+                                                Background="{DynamicResource AppAccentBrush}"
+                                                CornerRadius="4"
+                                                Padding="6,2"
+                                                VerticalAlignment="Center"
+                                                IsVisible="{Binding Scenarios.Count}">
+                                            <TextBlock Text="{Binding Scenarios.Count, StringFormat='\{0\} variants'}"
+                                                       FontSize="10"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="White" />
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        </Panel>
+                    </Border>
+
+                    <!-- Detail pane -->
+                    <Border Grid.Column="4" Classes="card-elevated">
+                        <Panel>
+                            <!-- Empty state -->
+                            <TextBlock Text="Select an app to see scenarios and start a preset."
+                                       Classes="muted"
+                                       TextWrapping="Wrap"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       MaxWidth="240"
+                                       IsVisible="{Binding !HasSelectedKnownApp}" />
+
+                            <!-- Selected app detail -->
+                            <ScrollViewer IsVisible="{Binding HasSelectedKnownApp}">
+                                <StackPanel Spacing="14"
+                                            DataContext="{Binding SelectedKnownApp}"
+                                            x:DataType="m:KnownApp">
+
+                                    <!-- Icon + title row -->
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Width="52" Height="52" CornerRadius="10"
+                                                ClipToBounds="True"
+                                                Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                VerticalAlignment="Top"
+                                                IsVisible="{Binding IconUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                            <Image ctrl:UrlImage.Source="{Binding IconUrl}"
+                                                   Stretch="Uniform" />
+                                        </Border>
+                                        <StackPanel Spacing="4" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding DisplayName}" Classes="h2" />
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                        CornerRadius="4" Padding="6,2">
+                                                    <TextBlock Text="{Binding Category}" FontSize="10"
+                                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                                </Border>
+                                                <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                        CornerRadius="4" Padding="6,2"
+                                                        IsVisible="{Binding Subcategory, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                                    <TextBlock Text="{Binding Subcategory}" FontSize="10"
+                                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                                </Border>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <TextBlock Text="{Binding Description}"
+                                               Classes="secondary"
+                                               TextWrapping="Wrap"
+                                               IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+                                    <ItemsControl ItemsSource="{Binding Tags}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="x:String">
+                                                <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                        CornerRadius="10" Padding="8,3"
+                                                        Margin="0,0,4,4">
+                                                    <TextBlock Text="{Binding}" FontSize="10"
+                                                               Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <TextBlock Text="{Binding Notes}"
+                                               Classes="muted"
+                                               TextWrapping="Wrap"
+                                               FontSize="11"
+                                               IsVisible="{Binding Notes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+                                    <!-- Primary actions -->
+                                    <StackPanel Spacing="6">
+                                        <Button Content="Use this app in editor"
+                                                Classes="accent"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Center"
+                                                Command="{Binding $parent[UserControl].((vm:PresetLibraryViewModel)DataContext).OpenInEditorCommand}"
+                                                CommandParameter="{Binding}" />
+                                        <Button Content="Start as background presence"
+                                                Classes="ghost"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Center"
+                                                IsEnabled="{Binding ClientId, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                Command="{Binding $parent[UserControl].((vm:PresetLibraryViewModel)DataContext).StartKnownAppInBackgroundCommand}"
+                                                CommandParameter="{Binding}" />
+                                        <TextBlock Text="No bundled Client ID — paste yours in the editor first."
+                                                   FontSize="10"
+                                                   Classes="muted"
+                                                   TextWrapping="Wrap"
+                                                   IsVisible="{Binding ClientId, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
+                                    </StackPanel>
+
+                                    <!-- Scenarios -->
+                                    <StackPanel Spacing="8" IsVisible="{Binding Scenarios.Count}">
+                                        <TextBlock Text="Scenarios" Classes="h3" />
+                                        <ItemsControl ItemsSource="{Binding Scenarios}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="m:AppScenario">
+                                                    <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                            CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                                                            <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+                                                                       Text="{Binding Name}"
+                                                                       FontWeight="SemiBold" FontSize="13" />
+                                                            <TextBlock Grid.Row="1" Grid.ColumnSpan="2"
+                                                                       Text="{Binding Description}"
+                                                                       FontSize="11"
+                                                                       Classes="muted"
+                                                                       TextWrapping="Wrap"
+                                                                       Margin="0,2,0,0" />
+                                                            <StackPanel Grid.Row="2" Grid.ColumnSpan="2"
+                                                                        Orientation="Horizontal" Spacing="6"
+                                                                        Margin="0,8,0,0">
+                                                                <Button Content="Use"
+                                                                        Classes="accent"
+                                                                        Padding="10,4"
+                                                                        Command="{Binding $parent[UserControl].((vm:PresetLibraryViewModel)DataContext).OpenScenarioInEditorCommand}"
+                                                                        CommandParameter="{Binding}" />
+                                                                <Button Content="Start in background"
+                                                                        Classes="ghost"
+                                                                        Padding="10,4"
+                                                                        Command="{Binding $parent[UserControl].((vm:PresetLibraryViewModel)DataContext).StartScenarioInBackgroundCommand}"
+                                                                        CommandParameter="{Binding}" />
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+
+                                    <!-- Process names -->
+                                    <StackPanel Spacing="4" IsVisible="{Binding ProcessNames.Count}">
+                                        <TextBlock Text="Process names" Classes="label" />
+                                        <ItemsControl ItemsSource="{Binding ProcessNames}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="x:String">
+                                                    <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                            CornerRadius="4" Padding="6,2"
+                                                            Margin="0,0,4,4">
+                                                        <TextBlock Text="{Binding}" FontSize="10"
+                                                                   FontFamily="Consolas, Cascadia Mono, monospace"
+                                                                   Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Panel>
+                    </Border>
+
+                </Grid>
+            </TabItem>
+
+            <!-- YOUR PRESETS TAB -->
+            <TabItem Header="Your Presets">
+                <ScrollViewer Margin="0,12,0,0">
+                    <StackPanel Spacing="20">
+
+                    <StackPanel Spacing="8" IsVisible="{Binding HasBundledPresets}">
+                        <TextBlock Text="Starter templates" Classes="h3" />
+                        <TextBlock Text="Bundled examples — open in the editor, add your Client ID, then save a copy to your library."
+                                   Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                        <ItemsControl ItemsSource="{Binding BundledPresets}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="svc:PresetEntry">
+                                    <Border Classes="card" Width="320" Height="180" Margin="0,0,12,12">
+                                        <Grid RowDefinitions="*,Auto">
+                                            <StackPanel Grid.Row="0" Spacing="4">
+                                                <Grid ColumnDefinitions="Auto,8,*">
+                                                    <Border Grid.Column="0" Width="24" Height="24"
+                                                            CornerRadius="4" ClipToBounds="True"
+                                                            Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                            VerticalAlignment="Center"
+                                                            IsVisible="{Binding Preset.Metadata.IconUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                                        <Image ctrl:UrlImage.Source="{Binding Preset.Metadata.IconUrl}"
+                                                               Stretch="Uniform" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding Preset.Metadata.Name}"
+                                                               Classes="h3"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               VerticalAlignment="Center" />
+                                                </Grid>
+                                                <TextBlock Text="{Binding Preset.Metadata.Description}" Classes="muted" FontSize="11" TextWrapping="Wrap" MaxLines="3" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
+                                                <Button Content="Open" Classes="accent" Padding="10,4"
+                                                        Command="{Binding $parent[ItemsControl].((vm:PresetLibraryViewModel)DataContext).LoadCommand}"
+                                                        CommandParameter="{Binding}" />
+                                                <Button Content="Save copy" Classes="ghost" Padding="10,4"
+                                                        Command="{Binding $parent[ItemsControl].((vm:PresetLibraryViewModel)DataContext).SaveBundledCopyCommand}"
+                                                        CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Saved presets" Classes="h3" />
+                        <TextBlock Text="Presets you saved from the editor or imported (.crpreset / legacy .crp)."
+                                   Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                        <TextBlock Text="No saved presets yet — use Save to library in the editor, Import, or save a starter template."
+                                   Classes="muted"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding !HasUserPresets}" />
+                    <ItemsControl ItemsSource="{Binding UserPresets}"
+                                  IsVisible="{Binding HasUserPresets}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" ItemWidth="320" ItemHeight="180" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="svc:PresetEntry">
+                                <Border Classes="card" Margin="0,0,12,12">
+                                    <Grid RowDefinitions="*,Auto">
+                                        <StackPanel Grid.Row="0" Spacing="4">
+                                            <Grid ColumnDefinitions="Auto,8,*">
+                                                <Border Grid.Column="0" Width="24" Height="24"
+                                                        CornerRadius="4" ClipToBounds="True"
+                                                        Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                        VerticalAlignment="Center"
+                                                        IsVisible="{Binding Preset.Metadata.IconUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                                    <Image ctrl:UrlImage.Source="{Binding Preset.Metadata.IconUrl}"
+                                                           Stretch="Uniform" />
+                                                </Border>
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding Preset.Metadata.Name}"
+                                                           Classes="h3"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           VerticalAlignment="Center" />
+                                            </Grid>
+                                            <TextBlock Text="{Binding Preset.ActivityName, FallbackValue=''}"
+                                                       Classes="secondary" FontSize="12"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Preset.Metadata.Description, FallbackValue=''}"
+                                                       Classes="muted" FontSize="11"
+                                                       TextWrapping="Wrap" MaxLines="2"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
+                                            <Button Content="Edit" Classes="accent" Padding="10,4"
+                                                    Command="{Binding $parent[ItemsControl].((vm:PresetLibraryViewModel)DataContext).LoadCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            <Button Content="Start" Classes="ghost" Padding="10,4"
+                                                    Command="{Binding $parent[ItemsControl].((vm:PresetLibraryViewModel)DataContext).StartUserPresetInBackgroundCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            <Button Content="Export" Classes="ghost" Padding="10,4"
+                                                    Command="{Binding $parent[ItemsControl].((vm:PresetLibraryViewModel)DataContext).ExportCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            <Button Content="Delete" Classes="ghost" Padding="10,4"
+                                                    IsVisible="{Binding !IsBundled}"
+                                                    Command="{Binding $parent[ItemsControl].((vm:PresetLibraryViewModel)DataContext).DeleteCommand}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+        </TabControl>
+
+    </Grid>
+
+</UserControl>

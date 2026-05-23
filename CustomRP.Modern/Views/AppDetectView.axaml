@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CustomRP.Modern.ViewModels"
+             xmlns:m="using:CustomRP.Modern.Models"
+             xmlns:ctrl="using:CustomRP.Modern.Controls"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700"
+             x:Class="CustomRP.Modern.Views.AppDetectView"
+             x:DataType="vm:AppDetectViewModel">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,12" Spacing="4">
+            <TextBlock Text="Auto-Detect Apps" Classes="h1" />
+            <TextBlock Text="Scan your running apps and start a preset for any of them with one click."
+                       Classes="muted" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="0,0,0,16" ColumnDefinitions="Auto,*,Auto">
+            <Button Grid.Column="0"
+                    Content="Scan now"
+                    Classes="accent"
+                    Command="{Binding ScanCommand}"
+                    IsEnabled="{Binding !IsScanning}" />
+            <TextBlock Grid.Column="1"
+                       Margin="14,0,0,0"
+                       VerticalAlignment="Center"
+                       Classes="muted"
+                       Text="{Binding LastScanLabel}" />
+            <ProgressBar Grid.Column="2"
+                         Width="120"
+                         IsIndeterminate="True"
+                         IsVisible="{Binding IsScanning}" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="2">
+            <ItemsControl ItemsSource="{Binding Detected}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" ItemWidth="320" ItemHeight="140" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="m:DetectedApp">
+                        <Border Classes="card" Margin="0,0,12,12">
+                            <Grid RowDefinitions="*,Auto" ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Row="0" Grid.Column="0" Spacing="3">
+                                    <!-- Icon + name row -->
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Width="28" Height="28" CornerRadius="6"
+                                                ClipToBounds="True"
+                                                Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                VerticalAlignment="Center"
+                                                IsVisible="{Binding Match.IconUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                            <Image ctrl:UrlImage.Source="{Binding Match.IconUrl}"
+                                                   Stretch="Uniform" />
+                                        </Border>
+                                        <StackPanel Spacing="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Match.DisplayName, FallbackValue=''}"
+                                                       Classes="h3"
+                                                       IsVisible="{Binding Match, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding ProcessName}"
+                                                       Classes="h3"
+                                                       IsVisible="{Binding Match, Converter={x:Static ObjectConverters.IsNull}}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding WindowTitle, FallbackValue=''}"
+                                               Classes="muted"
+                                               FontSize="11"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Border Background="{DynamicResource AppSurfaceHoverBrush}"
+                                                CornerRadius="4" Padding="6,2">
+                                            <TextBlock Text="{Binding ProcessName}"
+                                                       FontSize="10"
+                                                       Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                                        </Border>
+                                        <Border Background="{DynamicResource AppAccentBrush}"
+                                                CornerRadius="4" Padding="6,2"
+                                                IsVisible="{Binding Match, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            <TextBlock Text="known"
+                                                       FontSize="10"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="White" />
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                                <Button Grid.Row="1" Grid.ColumnSpan="2"
+                                        Content="Use this app"
+                                        Classes="accent"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Center"
+                                        Margin="0,10,0,0"
+                                        Command="{Binding $parent[ItemsControl].((vm:AppDetectViewModel)DataContext).UseDetectedCommand}"
+                                        CommandParameter="{Binding}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+    </Grid>
+
+</UserControl>

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "name": "Getting started",
+    "author": "CustomRP",
+    "description": "Paste your Discord application Client ID, set an activity name, then connect.",
+    "tags": ["starter", "template"]
+  },
+  "clientId": "",
+  "type": "Playing",
+  "display": "Name",
+  "activityName": "My Custom Status",
+  "details": "Hello from CustomRP Modern",
+  "state": "Edit me in the editor",
+  "timestamps": "SinceStart",
+  "buttons": [{}, {}]
+}

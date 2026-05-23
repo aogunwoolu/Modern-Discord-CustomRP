@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "name": "Listening to music",
+    "author": "CustomRP",
+    "description": "Template for a music listening activity. Add your app's Client ID and artwork keys from the Discord developer portal.",
+    "tags": ["starter", "music"]
+  },
+  "clientId": "",
+  "type": "Listening",
+  "display": "Details",
+  "activityName": "Spotify",
+  "details": "Artist — Track",
+  "state": "Album name",
+  "timestamps": "SinceStart",
+  "largeImage": { "key": "", "text": "Now playing" },
+  "buttons": [{}, {}]
+}

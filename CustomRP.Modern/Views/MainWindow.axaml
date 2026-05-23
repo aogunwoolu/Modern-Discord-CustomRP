@@ -1,0 +1,183 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:CustomRP.Modern.ViewModels"
+        xmlns:views="using:CustomRP.Modern.Views"
+        xmlns:cv="using:CustomRP.Modern.Converters"
+        mc:Ignorable="d"
+        x:Class="CustomRP.Modern.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="CustomRP — Discord Rich Presence Manager"
+        Width="1180" Height="760"
+        MinWidth="960" MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="PreferSystemChrome"
+        Background="{DynamicResource AppBackgroundBrush}">
+
+    <Window.Resources>
+        <cv:SectionEqualsConverter x:Key="SectionEquals" />
+        <cv:StatusToColorConverter x:Key="StatusToColor" />
+    </Window.Resources>
+
+    <Grid RowDefinitions="*,28">
+
+        <!-- Main content with sidebar -->
+        <Grid Grid.Row="0" ColumnDefinitions="240,*">
+
+            <!-- Sidebar -->
+            <Border Grid.Column="0"
+                    Background="{DynamicResource AppSurfaceBrush}"
+                    BorderBrush="{DynamicResource AppBorderBrush}"
+                    BorderThickness="0,0,1,0">
+                <DockPanel LastChildFill="True" Margin="14,40,14,14">
+
+                    <!-- Brand -->
+                    <StackPanel DockPanel.Dock="Top" Margin="6,0,6,18" Spacing="2">
+                        <TextBlock Text="CustomRP" FontSize="20" FontWeight="Bold"
+                                   Foreground="{DynamicResource AppTextPrimaryBrush}" />
+                        <TextBlock Text="Discord Rich Presence" FontSize="11"
+                                   Foreground="{DynamicResource AppTextMutedBrush}" />
+                    </StackPanel>
+
+                    <!-- Connection chip -->
+                    <Border DockPanel.Dock="Bottom"
+                            Classes="card"
+                            Padding="10"
+                            Margin="0,8,0,0">
+                        <StackPanel Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Ellipse Width="10" Height="10"
+                                         Fill="{Binding StatusKind, Converter={StaticResource StatusToColor}}" />
+                                <TextBlock Text="{Binding StatusKind}" Classes="h3" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding StatusMessage}"
+                                       Classes="muted"
+                                       TextWrapping="Wrap"
+                                       FontSize="11" />
+                            <TextBlock Text="{Binding ConnectedUsername, FallbackValue=''}"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       IsVisible="{Binding ConnectedUsername, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Nav -->
+                    <StackPanel Spacing="4">
+                        <RadioButton Classes="nav"
+                                     GroupName="nav"
+                                     IsChecked="{Binding SelectedSection, Converter={StaticResource SectionEquals}, ConverterParameter=Editor, Mode=TwoWay}"
+                                     Command="{Binding NavigateEditorCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                                          Width="16" Height="16"
+                                          Foreground="{Binding $parent[RadioButton].Foreground}" />
+                                <TextBlock Text="Editor" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton Classes="nav"
+                                     GroupName="nav"
+                                     IsChecked="{Binding SelectedSection, Converter={StaticResource SectionEquals}, ConverterParameter=Library, Mode=TwoWay}"
+                                     Command="{Binding NavigateLibraryCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M4 6H2v14a2 2 0 0 0 2 2h14v-2H4V6zm16-4H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"
+                                          Width="16" Height="16"
+                                          Foreground="{Binding $parent[RadioButton].Foreground}" />
+                                <TextBlock Text="Preset Library" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton Classes="nav"
+                                     GroupName="nav"
+                                     IsChecked="{Binding SelectedSection, Converter={StaticResource SectionEquals}, ConverterParameter=Detect, Mode=TwoWay}"
+                                     Command="{Binding NavigateDetectCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"
+                                          Width="16" Height="16"
+                                          Foreground="{Binding $parent[RadioButton].Foreground}" />
+                                <TextBlock Text="Auto-Detect" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton Classes="nav"
+                                     GroupName="nav"
+                                     IsChecked="{Binding SelectedSection, Converter={StaticResource SectionEquals}, ConverterParameter=Active, Mode=TwoWay}"
+                                     Command="{Binding NavigateActiveCommand}">
+                            <Grid ColumnDefinitions="Auto,12,*,Auto">
+                                <PathIcon Grid.Column="0"
+                                          Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"
+                                          Width="16" Height="16"
+                                          Foreground="{Binding $parent[RadioButton].Foreground}" />
+                                <TextBlock Grid.Column="2" Text="Active" VerticalAlignment="Center" />
+                                <Border Grid.Column="3"
+                                        Background="{DynamicResource AppAccentBrush}"
+                                        CornerRadius="9"
+                                        MinWidth="18" Height="18"
+                                        Padding="6,0"
+                                        VerticalAlignment="Center"
+                                        IsVisible="{Binding ActiveCount}">
+                                    <TextBlock Text="{Binding ActiveCount}"
+                                               FontSize="11"
+                                               FontWeight="Bold"
+                                               Foreground="White"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                        </RadioButton>
+                        <RadioButton Classes="nav"
+                                     GroupName="nav"
+                                     IsChecked="{Binding SelectedSection, Converter={StaticResource SectionEquals}, ConverterParameter=Settings, Mode=TwoWay}"
+                                     Command="{Binding NavigateSettingsCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M19.14 12.94a7.49 7.49 0 0 0 0-1.88l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54a7.03 7.03 0 0 0-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.49 7.49 0 0 0 0 1.88L2.83 14.52a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.5.38 1.04.69 1.62.94l.36 2.54a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.54a7.03 7.03 0 0 0 1.62-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z"
+                                          Width="16" Height="16"
+                                          Foreground="{Binding $parent[RadioButton].Foreground}" />
+                                <TextBlock Text="Settings" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
+                    </StackPanel>
+
+                </DockPanel>
+            </Border>
+
+            <!-- Content -->
+            <Border Grid.Column="1" Padding="28,40,28,16">
+                <Grid>
+                    <views:PresenceEditorView DataContext="{Binding Editor}"
+                                              IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedSection, Converter={StaticResource SectionEquals}, ConverterParameter=Editor}" />
+                    <views:PresetLibraryView DataContext="{Binding Library}"
+                                             IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedSection, Converter={StaticResource SectionEquals}, ConverterParameter=Library}" />
+                    <views:AppDetectView DataContext="{Binding Detect}"
+                                         IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedSection, Converter={StaticResource SectionEquals}, ConverterParameter=Detect}" />
+                    <views:ActiveConnectionsView DataContext="{Binding Active}"
+                                                 IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedSection, Converter={StaticResource SectionEquals}, ConverterParameter=Active}" />
+                    <views:SettingsView DataContext="{Binding Settings}"
+                                        IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedSection, Converter={StaticResource SectionEquals}, ConverterParameter=Settings}" />
+                </Grid>
+            </Border>
+
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource AppSurfaceBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="14,4">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusMessage}"
+                           FontSize="11"
+                           Classes="muted"
+                           VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1"
+                           Text="CustomRP Modern v2.0"
+                           FontSize="11"
+                           Classes="muted"
+                           VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</Window>
