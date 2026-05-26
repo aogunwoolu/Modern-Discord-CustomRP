@@ -16,6 +16,7 @@ internal static class PresencePayloadBuilder
 
     private const int MaxLineLength = 128;
     private const int MaxButtonLabel = 32;
+    private const int MaxButtonUrl = 512;
 
     public static RichPresence Build(Preset preset)
     {
@@ -74,8 +75,9 @@ internal static class PresencePayloadBuilder
             .Select(b => new DiscordRPC.Button
             {
                 Label = Truncate(b.Text!, MaxButtonLabel),
-                Url = b.Url!,
+                Url = NormalizeButtonUrl(b.Url!),
             })
+            .Where(b => !string.IsNullOrEmpty(b.Url))
             .Take(2)
             .ToArray();
         if (liveButtons.Length > 0)
@@ -89,6 +91,19 @@ internal static class PresencePayloadBuilder
 
     private static string Truncate(string value, int max) =>
         value.Length <= max ? value : value.Substring(0, max);
+
+    private static string NormalizeButtonUrl(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return url;
+        if (!url.Contains("://")) url = "https://" + url;
+        try
+        {
+            if (Uri.TryCreate(url, UriKind.Absolute, out var parsed))
+                url = parsed.AbsoluteUri.Replace(parsed.Host, parsed.IdnHost);
+        }
+        catch { }
+        return url.Length <= MaxButtonUrl ? url : url.Substring(0, MaxButtonUrl);
+    }
 
     public static string Summarize(RichPresence p)
     {

@@ -1026,7 +1026,8 @@ namespace CustomRPC
                 return false;
             }
 
-            rp.Buttons = buttonsList.ToArray();
+            if (buttonsList.Count > 0)
+                rp.Buttons = buttonsList.ToArray();
 
             switch ((TimestampType)settings.timestamps)
             {
